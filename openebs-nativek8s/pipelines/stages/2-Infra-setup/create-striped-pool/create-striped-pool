@@ -1,0 +1,6 @@
+#!/bin/bash
+set -x
+
+time="$(TZ=IST date)"
+current_time=$time
+echo $current_time

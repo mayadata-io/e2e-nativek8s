@@ -1,0 +1,94 @@
+## Define the stages & order of execution
+
+stages:
+    - CLUSTER-SETUP
+    - PROVIDER-INFRA-SETUP
+    - FUNCTIONAL-TEST
+    - OPENEBS-CLEANUP
+    - CLUSTER-CLEANUP
+
+##################################
+
+KUBEADM-CLUSTER:
+  image: openebs/openshift-ci:latest
+  stage: CLUSTER-SETUP 
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
+    - ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
+
+##################################
+
+OPENEBS-DEPLOY:
+  image: openebs/openshift-ci:latest
+  stage: PROVIDER-INFRA-SETUP
+  dependencies:
+    - KUBEADM-CLUSTER
+  script: 
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
+    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
+
+OPENEBS-SC-DEPLOY:
+  image: openebs/openshift-ci:latest
+  stage: PROVIDER-INFRA-SETUP
+  dependencies:
+    - KUBEADM-CLUSTER
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
+    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
+
+SPC-STRIPED-POOL:
+  image: openebs/openshift-ci:latest
+  stage: PROVIDER-INFRA-SETUP
+  dependencies:
+    - KUBEADM-CLUSTER
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
+    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
+
+##################################
+
+.func_test_template:
+  image: openebs/openshift-ci:latest
+  stage: FUNCTIONAL-TEST
+  when: always
+  dependencies:
+    - KUBEADM-CLUSTER
+
+ZFS-LocalPV PROVISIONER:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
+
+##################################
+
+.cleanup_test_template:
+  image: openebs/openshift-ci:latest
+  stage:  OPENEBS-CLEANUP
+  when: always
+  dependencies:
+    - OPENEBS-DEPLOY
+      
+CLEANUP-SPC-STRIPED-POOL:
+  extends: .cleanup_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
+    - ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
+
+OPENEBS-UNINSTALL:
+  extends: .cleanup_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
+    - ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
+
+##################################
+
+CLUSTER-DELETE:
+  image: openebs/openshift-ci:latest
+  stage: CLUSTER-CLEANUP
+  when: always
+  dependencies:
+    - KUBEADM-CLUSTER
+  script:
+    - chmod 775 ./openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup
+    - ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup/cluster-cleanup
