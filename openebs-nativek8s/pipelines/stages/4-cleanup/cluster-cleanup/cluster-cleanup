@@ -36,7 +36,7 @@ d2iq-node4.mayalabs.io \
 d2iq-node5.mayalabs.io' k8s/on-prem/openshift-installer/vm_name.csv
 
 #Replace the snapshot name and exp ip in vars
-sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "konvoy"/g' \
+sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "kubeadm"/g' \
 -e 's/esx_ip: "10.12.1.1"/esx_ip: "10.32.1.1"/g' k8s/on-prem/openshift-installer/vars.yml
 
 ansible-playbook k8s/on-prem/openshift-installer/revert_cluster_state.yml -vv
