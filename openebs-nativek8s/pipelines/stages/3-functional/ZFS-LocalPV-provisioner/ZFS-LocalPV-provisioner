@@ -36,8 +36,8 @@ sed -i -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc/g}' \
 -e '/name: FILE_SYSTEM/{n;s/.*/            value: zfs/g}' \
 -e '/name: POOL_TYPE/{n;s/.*/            value: stripe/g}' \
 -e '/name: ACTION/{n;s/.*/            value: provision/g}' \
--e '/name: COMPRESSION/{n;s/.*/            value: off/g}' \
--e '/name: DEDUP/{n;s/.*/            value: off/g}' \
+-e '/name: COMPRESSION/{n;s/.*/            value: "off"/g}' \
+-e '/name: DEDUP/{n;s/.*/            value: "off"/g}' \
 -e '/name: RECORDSIZE/{n;s/.*/            value: 4k/g}' zfs_pv_provisioner.yml
 
 cat zfs_pv_provisioner.yml
