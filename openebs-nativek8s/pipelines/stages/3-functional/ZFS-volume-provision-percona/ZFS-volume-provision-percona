@@ -30,7 +30,7 @@ echo $test_name
 cd litmus
 
 # copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
-cp apps/percona/deployers/run_litmus_test deploy_percona_zfspv.yml
+cp apps/percona/deployers/run_litmus_test.yml deploy_percona_zfspv.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: deploy-percona-zfs-pv/g' \
