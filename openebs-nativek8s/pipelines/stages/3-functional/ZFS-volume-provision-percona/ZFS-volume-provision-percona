@@ -36,6 +36,7 @@ cp apps/percona/deployers/run_litmus_test.yml deploy_percona_zfspv.yml
 sed -i -e 's/app: percona-deployment/app: deploy-percona-zfs-pv/g' \
 -e 's/generateName: litmus-percona-/generateName: litmus-percona-zfspv-/g' \
 -e 's/value: openebs-standard/value: zfs-sc/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
 -e 's/value: app-percona-ns/value: percona-zfspv/g' deploy_percona_zfspv.yml
 
 sed -i '/command:/i \
