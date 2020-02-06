@@ -90,7 +90,7 @@ git clone https://github.com/mayadata-io/litmus.git
 cd litmus
 
 wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/env-update/env.py # script to update openebs_setup.yaml
-python3 env.py -f providers/openebs/installers/operator/master/litmusbook/run_litmus_test.yaml
+#python3 env.py -f providers/openebs/installers/operator/master/litmusbook/run_litmus_test.yaml
 
 echo "updated yaml"
 sed -i -e 's/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g' \
@@ -135,7 +135,7 @@ testResult=$(kubectl get litmusresult ${test_name} --no-headers -o custom-column
 current_time=$(eval $time)
 bash openebs-nativek8s/utils/e2e-cr jobname:s2-j1-deploy-openebs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:$testResult
 
-python3 openebs-nativek8s/utils/result/result_update.py $job_id 2-Infra-setup "Deploy OpenEBS in openebs-nativek8s-Cluster with Ubuntu 18.04 and k8s 1.17" $testResult $pipeline_id "$current_time" $commit_id $gittoken
+#python3 openebs-nativek8s/utils/result/result_update.py $job_id 2-Infra-setup "Deploy OpenEBS in openebs-nativek8s-Cluster with Ubuntu 18.04 and k8s 1.17" $testResult $pipeline_id "$current_time" $commit_id $gittoken
 
 if [ "$rc_val" != "0" ]; then
 exit 1;
