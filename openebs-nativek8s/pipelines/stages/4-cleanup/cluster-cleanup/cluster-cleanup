@@ -16,24 +16,16 @@ git clone https://github.com/mayadata-io/litmus.git
 cd litmus
 
 # Replace the VM IP In csv file
-sed -i -e 's/10.12.22.10/10.34.1.162/g' \
--e 's/10.12.22.11/10.34.1.163/g' \
--e 's/10.12.22.12/10.34.1.164/g' \
--e 's/10.12.22.13/10.34.1.165/g' k8s/on-prem/openshift-installer/ip.csv
-
-sed -i '/10.34.1.165/a \
-10.34.1.166 \
-10.34.1.167' k8s/on-prem/openshift-installer/ip.csv
+sed -i -e 's/10.12.22.10/10.34.1.220/g' \
+-e 's/10.12.22.11/10.34.1.221/g' \
+-e 's/10.12.22.12/10.34.1.222/g' \
+-e 's/10.12.22.13/10.34.1.223/g' k8s/on-prem/openshift-installer/ip.csv
 
 #Replace the Vm names in csv file
-sed -i -e 's/auto1/d2iq-master.mayalabs.io/g' \
--e 's/auto2/d2iq-node1.mayalabs.io/g' \
--e 's/auto3/d2iq-node2.mayalabs.io/g' \
--e 's/auto4/d2iq-node3.mayalabs.io/g' k8s/on-prem/openshift-installer/vm_name.csv
-
-sed -i '/d2iq-node3.mayalabs.io/a \
-d2iq-node4.mayalabs.io \
-d2iq-node5.mayalabs.io' k8s/on-prem/openshift-installer/vm_name.csv
+sed -i -e 's/auto1/Native-k8s-pipeline-master/g' \
+-e 's/auto2/Native-K8s-pipeline-node1/g' \
+-e 's/auto3/Native-K8s-pipeline-node2/g' \
+-e 's/auto4/Native-K8s-pipeline-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
 
 #Replace the snapshot name and exp ip in vars
 sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "kubeadm"/g' \
