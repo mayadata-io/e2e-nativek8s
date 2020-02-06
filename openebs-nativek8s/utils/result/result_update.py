@@ -63,7 +63,7 @@ for i in dir_contents:
         job_dir = re.findall(r'{}\/(.*)\"\)'.format(stage), required_folder)[0]
         break
 
-# exit the python script if no job directory matching  
+# exit the #python script if no job directory matching  
 if  flag == 0:
  print("No Job {} directory found on path: {}".format(job_dir_initials, default_path))
  exit()
@@ -78,7 +78,7 @@ for i in dir_contents:
     if str(i).lower().find('readme.md')>0:
      flag = 1
      break
-# exit the python script if no readme.md file found at the job_dir_path
+# exit the #python script if no readme.md file found at the job_dir_path
 if  flag == 0:
  print("No Readme.md file found in the path: {}".format(job_dir_path))
  exit()

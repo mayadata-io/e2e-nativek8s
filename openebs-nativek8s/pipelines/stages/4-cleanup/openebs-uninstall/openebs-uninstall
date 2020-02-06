@@ -55,13 +55,13 @@ current_time=$(eval $time)
 
 if [ "$rc_val" != "0" ]; then
 bash openebs-nativek8s/utils/e2e-cr jobname:s4-j2-openebs-uninstall jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Fail
-python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
+#python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
 exit 1;
 fi
 
 bash openebs-nativek8s/utils/e2e-cr jobname:s4-j2-openebs-uninstall jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Pass
 
-python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
+#python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
 
 if [ "$rc_val" != "0" ]; then
 exit 1;
