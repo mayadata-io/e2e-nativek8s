@@ -70,6 +70,7 @@ cp apps/percona/deployers/run_litmus_test.yml deprovision_percona_zfspv.yml
 sed -i -e 's/app: percona-deployment/app: deprovision-percona-zfs-pv/g' \
 -e 's/generateName: litmus-percona-/generateName: litmus-percona-zfspv-dep-/g' \
 -e 's/value: openebs-standard/value: zfs-sc/g' \
+-e 's/value: provision/value: deprovision/g' \
 -e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
 -e 's/value: app-percona-ns/value: percona-zfspv/g' deprovision_percona_zfspv.yml
 
