@@ -25,10 +25,8 @@ echo "Generating test name***************************"
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=openebs-deprovision metadata="")
 echo $test_name
 
-
-# copy the content of deployer run_litmus_test.yml into a different file to update the test specific parameters.
+cd litmus
 cp providers/openebs/installers/operator/master/litmusbook/run_litmus_test.yaml cleanup_openebs.yml
-
 
 sed -i -e 's/name: litmus-openebs-runner/name: litmus-openebs-deprovision/g' \
 -e 's/provider: openebs-runner/provider: openebs-deprovision/g' \
@@ -55,13 +53,10 @@ current_time=$(eval $time)
 
 if [ "$rc_val" != "0" ]; then
 bash openebs-nativek8s/utils/e2e-cr jobname:s4-j2-openebs-uninstall jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Fail
-#python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
 exit 1;
 fi
 
 bash openebs-nativek8s/utils/e2e-cr jobname:s4-j2-openebs-uninstall jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Pass
-
-#python3 openebs-nativek8s/utils/result/result_update.py $job_id   2-setup "Cleanup OpenEBS related components" $testResult $pipeline_id "$current_time" $commit_id $gittoken
 
 if [ "$rc_val" != "0" ]; then
 exit 1;

@@ -52,6 +52,40 @@ bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 bash openebs-nativek8s/utils/event_updater jobname:s3-j2-zfs-volume-provision-percona $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
+if [ "$?" != "0" ]; then
+exit 1;
+fi
+
+
+################
+# LitmusBook 2 #
+################
+
+run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+
+cd litmus
+cp apps/percona/deployers/run_litmus_test.yml deprovision_percona_zfspv.yml
+
+sed -i -e 's/app: percona-deployment/app: deprovision-percona-zfs-pv/g' \
+-e 's/generateName: litmus-percona-/generateName: litmus-percona-zfspv-dep-/g' \
+-e 's/value: openebs-standard/value: zfs-sc/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: percona-zfspv/g' deprovision_percona_zfspv.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' deprovision_percona_zfspv.yml           
+
+echo "Running the litmus test for percona Deprovision.."
+cat deprovision_percona_zfspv.yml
+
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:deprovision-percona-zfs-pv' job=deprovision_percona_zfspv.yml
+cd ..
+bash openebs-nativek8s/utils/dump_cluster_state;
+bash openebs-nativek8s/utils/event_updater jobname:s3-j2-zfs-volume-provision-percona $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
 #################
 ## GET RESULT  ##
 #################
