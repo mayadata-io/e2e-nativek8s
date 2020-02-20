@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 pod() {
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs node '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"' '"'$RELEASE_BRANCH'"' '"'$NDM_TAG'"' '"'$E_USER'"' '"'$E_PASSWORD'"'
 }
@@ -11,8 +10,6 @@ commit_id=$(echo $3)
 releaseTag=$(echo $4)
 releaseBranch=$(echo $5)
 ndmTag=$(echo $6)
-elastic_user=$(echo $7)
-elastic_password=$(echo $8)
 
 time="date"
 current_time=$(eval $time)
