@@ -6,7 +6,7 @@ zfspv_clone_deprovision_rc_val=1
 zfspv_snapshot_deprovision_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
-connect() {
+connect_cluster() {
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
 
 }
@@ -226,7 +226,7 @@ fi
 }
 
 
-if [ "$1" == "node" ];then
+if [ "$1" == "run_job" ];then
   zfspv_clone $2 $3 $4 $5
   zfspv_clone_deprovision
   zfspv_snapshot_deprovision
