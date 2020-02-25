@@ -1,19 +1,21 @@
 #!/bin/bash
 
-zfs_clone_rc_val=1
-zfs_clone_deprovision_rc_val=1
-zfs_snap_deprovision_rc_val=1
+## Define and initialize test-result specific variables.
+zfspv_clone_rc_val=1
+zfspv_clone_deprovision_rc_val=1
+zfspv_snapshot_deprovision_rc_val=1
 
+## SSH into the cluster to run the kubernetes jobs for the experiments
 connect() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone node '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
 
 }
 
-####################
-# create zfs-clone #
-####################
+######################
+# create zfspv-clone #
+######################
 
-zfs_clone() {
+zfspv_clone() {
 
 job_id=$(echo $1)
 pipeline_id=$(echo $2)
@@ -28,7 +30,7 @@ current_time=$(eval $time)
 bash openebs-nativek8s/utils/pooling jobname:s3-j3-zfspv-snapshot
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag"
 
-## Creating clone for the snapshot created in the previous job
+## Generate the test name to run litmusbook for creating zfspv-clone
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
 echo $test_name
 cd litmus
@@ -49,26 +51,30 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs-snap/}' \
 
 cat zfs_clone_test.yml
 
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
 bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfspv-clone' job=zfs_clone_test.yml
+## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
+## Update the e2e event for the job.
 bash openebs-nativek8s/utils/event_updater jobname:s3-j4-zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
-zfs_clone_rc_val=$(echo $?)
+zfspv_clone_rc_val=$(echo $?)
 
-if [ "$zfs_clone_rc_val" != "0" ]; then
-zfs_snap_deprovision
+if [ "$zfspv_clone_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision
 app_deprovision
 fi
 
 }
 
-#########################
-# Deprovision zfs-clone #
-#########################
+###########################
+# Deprovision zfspv-clone #
+###########################
 
-zfs_clone_deprovision() {
+zfspv_clone_deprovision() {
 
+## Generate test name to run litmusbook for deprovisioning the zfspv clone
 run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
 echo $test_name
 cd litmus
@@ -97,26 +103,30 @@ sed -i '/command:/i \
 
 cat zfs_clone_deprovision.yml
 
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
 bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfspv-clone-deprovision' job=zfs_clone_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
+## Update the e2e event for the job.
 bash openebs-nativek8s/utils/event_updater jobname:s3-j4-zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
-zfs_clone_deprovision_rc_val=$(echo $?)
+zfspv_clone_deprovision_rc_val=$(echo $?)
 
-if [ "$zfs_clone_deprovision_rc_val" != "0" ]; then
-zfs_snap_deprovision
+if [ "$zfspv_clone_deprovision_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision
 app_deprovision
 fi
 
 }
 
-############################
-# Deprovision zfs-snapshot #
-############################
+##############################
+# Deprovision zfspv-snapshot #
+##############################
 
-zfs_snap_deprovision() {
+zfspv_snapshot_deprovision() {
 
+## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
 run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
 echo $test_name
 cd litmus
@@ -143,14 +153,17 @@ sed -i '/command:/i \
 
 cat zfs_snap_deprovision.yml
 
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
 bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfspv-snapshot-deprovision' job=zfs_snap_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
+## Update the e2e event for the job.
 bash openebs-nativek8s/utils/event_updater jobname:s3-j4-zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
-zfs_snap_deprovision_rc_val=$(echo $?)
+zfspv_snapshot_deprovision_rc_val=$(echo $?)
 
-if [ "$zfs_snap_deprovision_rc_val" != "0" ]; then
+if [ "$zfspv_snapshot_deprovision_rc_val" != "0" ]; then
 app_deprovision
 fi
 
@@ -162,6 +175,7 @@ fi
 
 app_deprovision() {
   
+## Generate test name to run litmusbook for deprovisioning the percona application
 run_id="snap-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
 echo $test_name
 cd litmus
@@ -184,27 +198,27 @@ sed -i '/command:/i \
 
 cat percona_deprovision.yml
 
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
 bash ../openebs-nativek8s/utils/litmus_job_runner label='app:deprovision-percona-zfs-snap' job=percona_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
+## Update the e2e event for the job.
 bash openebs-nativek8s/utils/event_updater jobname:s3-j4-zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" -eq "0" ] &&
-   [ "$zfs_snap_deprovision_rc_val" -eq "0" ] &&
-   [ "$zfs_clone_deprovision_rc_val" -eq "0" ] &&
-   [ "$zfs_clone_rc_val" -eq "0" ]; then
+   [ "$zfspv_snapshot_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_rc_val" -eq "0" ]; then
 
+## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Pass
 exit 1;
 
-fi
-
-if [ "$app_deprovision_rc_val" != "0" ]; then
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Fail
-exit 1;
 else
+## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Fail
 exit 1;
 fi
@@ -213,10 +227,10 @@ fi
 
 
 if [ "$1" == "node" ];then
-  zfs_clone $2 $3 $4 $5
-  zfs_clone_deprovision
-  zfs_snap_deprovision
+  zfspv_clone $2 $3 $4 $5
+  zfspv_clone_deprovision
+  zfspv_snapshot_deprovision
   app_deprovision
 else
-  connect
+  connect_cluster
 fi
