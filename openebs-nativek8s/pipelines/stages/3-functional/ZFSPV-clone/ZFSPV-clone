@@ -4,7 +4,7 @@ zfs_clone_rc_val=1
 zfs_clone_deprovision_rc_val=1
 zfs_snap_deprovision_rc_val=1
 
-pod() {
+connect() {
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone node '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
 
 }
@@ -218,5 +218,5 @@ if [ "$1" == "node" ];then
   zfs_snap_deprovision
   app_deprovision
 else
-  pod
+  connect
 fi
