@@ -76,6 +76,18 @@ ZFS-VOLUME-PROVISION-PERCONA:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-volume-provision-percona/ZFS-volume-provision-percona
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-volume-provision-percona/ZFS-volume-provision-percona
     
+ZFSPV-SNAPSHOT:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
+
+ZFSPV-CLONE:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
+    
 ##################################
 
 .cleanup_test_template:

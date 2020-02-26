@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 pod() {
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFS-volume-provision-percona/ZFS-volume-provision-percona node '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
 
@@ -18,7 +18,7 @@ current_time=$(eval $time)
 
 echo "*******ZFS volume provision**************"
 
-bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfs-pv-provisioner
+bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j2-zfs-volume-provision-percona jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag"
 
 

@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 pod() {
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool node '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
 
