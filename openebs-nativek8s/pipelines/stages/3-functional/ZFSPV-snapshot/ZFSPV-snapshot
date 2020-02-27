@@ -155,7 +155,6 @@ if [ "$app_deploy_rc_val" -eq "0" ] &&
 
 ## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-zfspv-snapshot jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Pass
-exit 1;
 
 else
 ## Update the e2e-result-custom-resources for the job
