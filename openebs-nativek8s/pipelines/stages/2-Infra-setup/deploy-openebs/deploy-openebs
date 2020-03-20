@@ -24,10 +24,6 @@ echo $present_dir
 # echo "EFK: Deploying Aggregrator and Forwarder on client"
 # ansible-playbook efk.yml --extra-vars "commit_id=$commit_id pipeline_id=$pipeline_id e_user=$elastic_user e_password=$elastic_password" 
 
-# Applying e2e-CRD
-echo "***Applying e2e-crd***********"
-kubectl apply -f openebs-nativek8s/utils/e2e-crd.yml
-
 echo "*****Deploying openebs*******"
 bash openebs-nativek8s/utils/e2e-cr jobname:s2-j1-deploy-openebs jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s2-j1-deploy-openebs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag"
@@ -81,10 +77,7 @@ echo "Generating test name***************************"
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=openebs-provision metadata="")
 echo $test_name
 
-## Clone the litmus repo, navigate to litmus root 
-
-git clone https://github.com/mayadata-io/litmus.git
-cd litmus
+cd e2e-tests
 
 wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/env-update/env.py # script to update openebs_setup.yaml
 #python3 env.py -f providers/openebs/installers/operator/master/litmusbook/run_litmus_test.yaml
@@ -99,14 +92,6 @@ cat providers/openebs/installers/operator/master/litmusbook/run_litmus_test.yaml
 #################
 ## RUNNER MAIN ##
 #################
-
-echo "Applying rbac.yml********************************"
-kubectl apply -f ./hack/rbac.yaml
-kubectl apply -f ./hack/crds.yaml
-
-echo "Copying kube config for litmus"
-cp ~/.kube/config admin.conf
-kubectl create cm kubeconfig --from-file=admin.conf -n litmus
 
 echo "Running litmus test for openebs deploy.."
 

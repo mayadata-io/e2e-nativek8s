@@ -7,7 +7,7 @@ zfspv_snapshot_deprovision_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$RELEASE_TAG'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
 
 }
 
@@ -20,7 +20,6 @@ zfspv_clone() {
 job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
-releaseTag=$(echo $4)
 source ~/.profile
 
 time="date"
@@ -28,7 +27,7 @@ current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
 bash openebs-nativek8s/utils/pooling jobname:s3-j3-zfspv-snapshot
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag"
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name to run litmusbook for creating zfspv-clone
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
@@ -214,11 +213,11 @@ if [ "$app_deprovision_rc_val" -eq "0" ] &&
    [ "$zfspv_clone_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Pass
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 else
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" openebs_version:"$releaseTag" test_result:Fail
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 fi
 

@@ -20,38 +20,38 @@ KUBEADM-CLUSTER:
 
 ##################################
 
-OPENEBS-DEPLOY:
-  image: openebs/openshift-ci:latest
-  stage: PROVIDER-INFRA-SETUP
-  tags:
-    - k8s-native
-  dependencies:
-    - KUBEADM-CLUSTER
-  script: 
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
-    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
+# OPENEBS-DEPLOY:
+#   image: openebs/openshift-ci:latest
+#   stage: PROVIDER-INFRA-SETUP
+#   tags:
+#     - k8s-native
+#   dependencies:
+#     - KUBEADM-CLUSTER
+#   script: 
+#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
+#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
 
-OPENEBS-SC-DEPLOY:
-  image: openebs/openshift-ci:latest
-  stage: PROVIDER-INFRA-SETUP
-  tags:
-    - k8s-native
-  dependencies:
-    - KUBEADM-CLUSTER
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
-    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
+# OPENEBS-SC-DEPLOY:
+#   image: openebs/openshift-ci:latest
+#   stage: PROVIDER-INFRA-SETUP
+#   tags:
+#     - k8s-native
+#   dependencies:
+#     - KUBEADM-CLUSTER
+#   script:
+#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
+#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
 
-SPC-STRIPED-POOL:
-  image: openebs/openshift-ci:latest
-  stage: PROVIDER-INFRA-SETUP
-  tags:
-    - k8s-native
-  dependencies:
-    - KUBEADM-CLUSTER
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
-    - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
+# SPC-STRIPED-POOL:
+#   image: openebs/openshift-ci:latest
+#   stage: PROVIDER-INFRA-SETUP
+#   tags:
+#     - k8s-native
+#   dependencies:
+#     - KUBEADM-CLUSTER
+#   script:
+#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
+#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
 
 ##################################
 
@@ -70,12 +70,24 @@ ZFS-LocalPV PROVISIONER:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
 
-ZFS-VOLUME-PROVISION-PERCONA:
+ZFS-VOLUME-RESIZE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-volume-provision-percona/ZFS-volume-provision-percona
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-volume-provision-percona/ZFS-volume-provision-percona
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
     
+ZFS-VOLUME-RESIZE-XFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
+
+ZFS-VOLUME-RESIZE-ext4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+
 ZFSPV-SNAPSHOT:
   extends: .func_test_template
   script:
@@ -90,26 +102,26 @@ ZFSPV-CLONE:
     
 ##################################
 
-.cleanup_test_template:
-  image: openebs/openshift-ci:latest
-  stage:  OPENEBS-CLEANUP
-  tags:
-    - k8s-native
-  when: always
-  dependencies:
-      - OPENEBS-DEPLOY
+# .cleanup_test_template:
+#   image: openebs/openshift-ci:latest
+#   stage:  OPENEBS-CLEANUP
+#   tags:
+#     - k8s-native
+#   when: always
+#   dependencies:
+#       - OPENEBS-DEPLOY
       
-CLEANUP-SPC-STRIPED-POOL:
-  extends: .cleanup_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
-    - ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
+# CLEANUP-SPC-STRIPED-POOL:
+#   extends: .cleanup_test_template
+#   script:
+#     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
+#     - ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
 
-OPENEBS-UNINSTALL:
-  extends: .cleanup_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
-    - ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
+# OPENEBS-UNINSTALL:
+#   extends: .cleanup_test_template
+#   script:
+#     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
+#     - ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
 
 ##################################
 

@@ -4,7 +4,7 @@ pod() {
 echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $user@$ip -p $port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup node '"'$CI_JOB_ID'"''
 }
 
