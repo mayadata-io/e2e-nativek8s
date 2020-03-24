@@ -51,7 +51,7 @@ sed -i '/command:/i \
 cat deploy_percona_zfspv.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../openebs-nativek8s/utils/litmus_job_runner label='app:deploy-percona-zfs-pv' job=deploy_percona_zfspv.yml
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:deploy-percona-zfs' job=deploy_percona_zfspv.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..

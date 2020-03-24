@@ -40,7 +40,7 @@ sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'git clone -
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git clone https://github.com/openebs/e2e-tests.git'
 
 echo "***Applying the e2e-CRD's yaml***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && kubectl apply -f .utils/e2e-crd.yml'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s/openebs-nativek8s && kubectl apply -f ./utils/e2e-crd.yml'
 
 echo "***Applying rbac and crds yaml***"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s/e2e-tests/hack && kubectl apply -f rbac.yaml && kubectl apply -f crds.yaml'

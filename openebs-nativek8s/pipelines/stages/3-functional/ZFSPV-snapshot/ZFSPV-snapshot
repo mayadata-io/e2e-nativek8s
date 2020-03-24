@@ -40,7 +40,7 @@ cp apps/percona/deployers/run_litmus_test.yml deploy_percona_zfssnap.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: deploy-percona-zfs-snap/g' \
 -e 's/generateName: litmus-percona-/generateName: litmus-percona-zfssnap-/g' \
--e 's/value: openebs-standard/value: zfs-sc/g' \
+-e 's/value: openebs-standard/value: zfs-sc-zfsg' \
 -e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
 -e 's/value: app-percona-ns/value: percona-zfs-snap/g' deploy_percona_zfssnap.yml
 
