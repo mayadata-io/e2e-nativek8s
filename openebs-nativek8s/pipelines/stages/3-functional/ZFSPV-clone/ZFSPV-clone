@@ -32,7 +32,7 @@ bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Running i
 ## Generate the test name to run litmusbook for creating zfspv-clone
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
 echo $test_name
-cd litmus
+cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
 cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml zfs_clone_test.yml
@@ -76,7 +76,7 @@ zfspv_clone_deprovision() {
 ## Generate test name to run litmusbook for deprovisioning the zfspv clone
 run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
 echo $test_name
-cd litmus
+cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
 cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml zfs_clone_deprovision.yml
@@ -128,7 +128,7 @@ zfspv_snapshot_deprovision() {
 ## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
 run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
 echo $test_name
-cd litmus
+cd e2e-tests
 
 # copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
 cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml zfs_snap_deprovision.yml
@@ -177,7 +177,7 @@ app_deprovision() {
 ## Generate test name to run litmusbook for deprovisioning the percona application
 run_id="snap-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
 echo $test_name
-cd litmus
+cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
 cp apps/percona/deployers/run_litmus_test.yml percona_deprovision.yml

@@ -1,18 +1,18 @@
 #!/bin/bash
 
-pod() {
+connect_cluster() {
 echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $user@$ip -p $port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup node '"'$CI_JOB_ID'"''
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
-node() {
+cleanup_cluster() {
 job_id=$(echo $1)
 
-git clone https://github.com/mayadata-io/litmus.git
-cd litmus
+git clone https://github.com/openebs/e2e-tests.git
+cd e2e-tests
 
 # Replace the VM IP In csv file
 sed -i -e 's/10.12.22.10/10.34.1.220/g' \
@@ -36,8 +36,8 @@ ansible-playbook k8s/on-prem/openshift-installer/revert_cluster_state.yml -vv
 cd && rm -rf e2e-nativek8s && rm -rf infra
 }
 
-if [ "$1" == "node" ];then
-  node $2
+if [ "$1" == "run_job" ];then
+  cleanup_cluster $2
 else
-  pod
+  connect_cluster
 fi
