@@ -1,0 +1,176 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_deploy_rc_val=1
+zv_property_modify_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+
+}
+
+#######################################
+# Deploy percona application on ZFSPV #
+#######################################
+
+app_deploy() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+source ~/.profile
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify-ext4 jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="ext4-property-modify";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp apps/percona/deployers/run_litmus_test.yml percona_deploy_ext4_property_modify.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-deploy-ext4-property-modify/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-deploy-ext4-property-modify-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-ext4/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: percona-ext4-modify/g' percona_deploy_ext4_property_modify.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_deploy_ext4_property_modify.yml
+
+cat percona_deploy_ext4_property_modify.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-deploy-ext4-property-modify' job=percona_deploy_ext4_property_modify.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_rc_val=$(echo $?)
+if [ "$app_deploy_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+######################
+# ZV property modify #
+######################
+
+zv_property_modify() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="ext4";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zvol-property-runtime-modify metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp experiments/functional/zfs-LocalPV/zv-property-runtime-modify/run_litmus_test.yml name: zv_property_runtime_modify.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: ext4-zv-property-runtime-modify/g' \
+-e 's/name: zv-property-runtime-modify/name: ext4-zv-property-runtime-modify/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-ext4-modify/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: NEW_COMPRESSION_PARAMETER/{n;s/.*/            value: on/}' \
+-e '/name: NEW_DEDUP_PARAMETER/{n;s/.*/            value: on/}' \
+-e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' name: zv_property_runtime_modify.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zv_property_runtime_modify.yml
+
+cat zv_property_runtime_modify.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:ext-zv-property-runtime-modify' job=zv_property_runtime_modify.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zv_property_modify_rc_val=$(echo $?)
+if [ "$zv_property_modify_rc_val" != "0" ]; then
+app_deprovision
+fi
+
+}
+
+#######################################
+#   Deprovision percona application   #
+#######################################
+
+app_deprovision() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="deprovision-ext-property-modify";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+
+# copy the content of workload run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp apps/percona/deployers/run_litmus_test.yml percona_deprovision_ext_property_modify.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-deprovision-ext-property-modify/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-deprovision-ext-property-modify-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-ext/g' \
+-e 's/value: provision/value: deprovision/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: percona-ext-modify/g' percona_deprovision_ext_property_modify.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_deprovision_ext_property_modify.yml           
+
+cat percona_deprovision_ext_property_modify.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-deprovision-ext-property-modify' job=percona_deprovision_ext_property_modify.yml
+cd ..
+## Get the cluster state Once the litmus jobs completed.
+bash openebs-nativek8s/utils/dump_cluster_state;
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_rc_val=$(echo $?)
+
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
+   [ "$zv_property_modify_rc_val" -eq "0" ] &&
+   [ "$app_deploy_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+exit 1;
+fi
+
+}
+
+if [ "$1" == "run_job" ];then
+  app_deploy $2 $3 $4
+  zv_property_modify
+  app_deprovision
+else
+  connect_cluster
+fi
