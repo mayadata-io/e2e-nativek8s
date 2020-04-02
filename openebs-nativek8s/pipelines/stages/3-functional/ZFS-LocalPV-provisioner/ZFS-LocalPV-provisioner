@@ -28,6 +28,9 @@ bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-zfspv-snapshot jobphase:Waitin
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-zfspv-clone jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j5-zfs-vol-resize-xfs jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j6-zfs-vol-resize-ext4 jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j7-zv-property-modify jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify-ext4 jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j9-zv-property-modify-xfs jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j1-zfspv-provisioner jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the litmusbook for deploying ZFS LocalPV provisioner

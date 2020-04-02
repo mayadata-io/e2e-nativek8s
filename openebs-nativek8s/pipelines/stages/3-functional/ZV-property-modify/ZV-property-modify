@@ -77,7 +77,7 @@ echo $test_name
 
 ## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
 cd e2e-tests
-cp experiments/functional/zfs-LocalPV/zv-property-runtime-modify/run_litmus_test.yml name: zv_property_runtime_modify.yml
+cp experiments/functional/zfs-LocalPV/zv-property-runtime-modify/run_litmus_test.yml zv_property_runtime_modify.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: zfs-zv-property-runtime-modify/g' \
@@ -87,9 +87,9 @@ sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: zfs-zv-prop
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
--e '/name: NEW_COMPRESSION_PARAMETER/{n;s/.*/            value: on/}' \
--e '/name: NEW_DEDUP_PARAMETER/{n;s/.*/            value: on/}' \
--e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' name: zv_property_runtime_modify.yml
+-e '/name: NEW_COMPRESSION_PARAMETER/{n;s/.*/            value: "on"/}' \
+-e '/name: NEW_DEDUP_PARAMETER/{n;s/.*/            value: "on"/}' \
+-e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' zv_property_runtime_modify.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
