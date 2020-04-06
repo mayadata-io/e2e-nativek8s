@@ -1,0 +1,383 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_deploy_ext4_rc_val=1
+app_loadgen_ext4_rc_val=1
+zfspv_snapshot_ext4_rc_val=1
+zfspv_clone_ext4_rc_val=1
+zfspv_clone_ext4_deprovision_rc_val=1
+zfspv_snapshot_ext4_deprovision_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+
+}
+
+###########################################################
+# Deploy percona application on ZFSPV when fstype is ext4 #
+###########################################################
+
+app_deploy_ext4() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+source ~/.profile
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="ext4-snap-clone";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of deployers run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/deployers/run_litmus_test.yml percona_ext4_snap_clone.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: snap-clone-ext4/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-ext4-snap-clone-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-ext4/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: snap-clone-ext4/g' percona_ext4_snap_clone.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_ext4_snap_clone.yml
+
+cat percona_ext4_snap_clone.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:snap-clone-ext4' job=percona_ext4_snap_clone.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_ext4_rc_val=$(echo $?)
+if [ "$app_deploy_ext4_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+###################################
+# Loadgen on Percona application  #
+###################################
+
+app_loadgen_ext4() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="ext4-snap-clone";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-loadgen metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/workload/run_litmus_test.yml loadgen_ext4_snap_clone.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: snap-clone-ext4/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-ext4-snap-clone-/g' \
+-e 's/value: app-percona-ns/value: snap-clone-ext4/g' loadgen_ext4_snap_clone.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' loadgen_ext4_snap_clone.yml
+
+cat loadgen_ext4_snap_clone.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='loadgen:snap-clone-ext4' job=loadgen_ext4_snap_clone.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_loadgen_ext4_rc_val=$(echo $?)
+if [ "$app_loadgen_ext4_rc_val" != "0" ]; then
+app_deprovision_ext4
+fi
+
+}
+
+##############################
+# Create zfspv-snapshot-ext4 #
+##############################
+
+zfspv_snapshot_ext4() { 
+  
+## Generate test name for running litmusbook for creating zfspv snapshot
+run_id="ext4";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_ext4.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: snapshot-zfspv-ext4/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
+-e 's/name: zfspv-snapshot/name: snapshot-ext4/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-ext4/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' snap_ext4.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: snap_clone_ext4
+' snap_ext4.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' snap_ext4.yml
+
+cat snap_ext4.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snapshot-ext4' job=snap_ext4.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_snapshot_ext4_rc_val=$(echo $?)
+if [ "$zfspv_snapshot_ext4_rc_val" != "0" ]; then
+app_deprovision_ext4
+fi
+
+}
+
+###########################
+# create zfspv-clone-ext4 #
+###########################
+
+zfspv_clone_ext4() {
+
+## Generate the test name to run litmusbook for creating zfspv-clone
+run_id="ext4";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_ext4.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-ext4/g' \
+-e 's/name: zfspv-clone/name: clone-zfspv-ext4/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-ext4/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-ext4/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_ext4.yml
+
+cat clone_ext4.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-zfspv-ext4' job=clone_ext4.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_clone_ext4_rc_val=$(echo $?)
+if [ "$zfspv_clone_ext4_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision_ext4
+app_deprovision_ext4
+fi
+
+}
+
+################################
+# Deprovision zfspv-clone-ext4 #
+################################
+
+zfspv_clone_ext4_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv clone
+run_id="ext4-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_ext4_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: clone-ext4-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-clone/  name: clone-ext4-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-ext4/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-ext4/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_ext4_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_ext4_deprovision.yml
+
+cat clone_ext4_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-ext4-deprovision' job=clone_ext4_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_clone_ext4_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_clone_ext4_deprovision_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision_ext4
+app_deprovision_ext4
+fi
+
+}
+
+###################################
+# Deprovision zfspv-snapshot-ext4 #
+###################################
+
+zfspv_snapshot_ext4_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
+run_id="ext4-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_ext4_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: snap-ext4-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-snapshot/  name: snap-ext4-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-ext4/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' snap_ext4_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' snap_ext4_deprovision.yml
+
+cat snap_ext4_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snap-ext4-deprovision' job=snap_ext4_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_snapshot_ext4_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_snapshot_ext4_deprovision_rc_val" != "0" ]; then
+app_deprovision_ext4
+fi
+
+}
+
+###########################
+# Deprovision Application #
+###########################
+
+app_deprovision_ext4() {
+  
+## Generate test name to run litmusbook for deprovisioning the percona application
+run_id="ext4-snap-clone-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/deployers/run_litmus_test.yml percona_ext4_snap_clone_dep.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: dep-snap-clone-ext4/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-snap-clone-ext4-dep-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-ext4/g' \
+-e 's/value: provision/value: deprovision/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: snap-clone-ext4/g' percona_ext4_snap_clone_dep.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_ext4_snap_clone_dep.yml
+
+cat percona_ext4_snap_clone_dep.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:dep-snap-clone-ext4' job=percona_ext4_snap_clone_dep.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_ext4_rc_val=$(echo $?)
+
+if [ "$app_deprovision_ext4_rc_val" -eq "0" ] &&
+   [ "$zfspv_snapshot_ext4_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_ext4_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_ext4_rc_val" -eq "0" ] &&
+   [ "$zfspv_snapshot_ext4_rc_val" -eq "0" ] &&
+   [ "$app_loadgen_ext4_rc_val" -eq "0" ] &&
+   [ "$app_deploy_ext4_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+exit 1;
+fi
+
+}
+
+
+if [ "$1" == "run_job" ];then
+  app_deploy_ext4 $2 $3 $4 $5
+  app_loadgen_ext4
+  zfspv_snapshot_ext4
+  zfspv_clone_ext4
+  zfspv_clone_ext4_deprovision
+  zfspv_snapshot_ext4_deprovision
+  app_deprovision_ext4
+else
+  connect_cluster
+fi
