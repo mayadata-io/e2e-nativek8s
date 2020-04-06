@@ -26,7 +26,7 @@ current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
 bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j7-zv-property-modify jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the litmusbook for percona deployment
 run_id="zfs-property-modify";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
@@ -56,7 +56,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-deploy-zfs-
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j7-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deploy_rc_val=$(echo $?)
 if [ "$app_deploy_rc_val" != "0" ]; then
@@ -104,7 +104,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfs-zv-property-ru
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j7-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zv_property_modify_rc_val=$(echo $?)
 if [ "$zv_property_modify_rc_val" != "0" ]; then
@@ -148,7 +148,7 @@ cd ..
 ## Get the cluster state Once the litmus jobs completed.
 bash openebs-nativek8s/utils/dump_cluster_state;
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j7-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j8-zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
 
@@ -157,11 +157,11 @@ if [ "$app_deprovision_rc_val" -eq "0" ] &&
    [ "$app_deploy_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j7-zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 else
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j7-zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j8-zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 fi
 

@@ -30,7 +30,7 @@ current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
 bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j10-snap-clone-ext4 jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the litmusbook for percona deployment
 run_id="ext4-snap-clone";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
@@ -60,7 +60,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='app:snap-clone-ext4' jo
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deploy_ext4_rc_val=$(echo $?)
 if [ "$app_deploy_ext4_rc_val" != "0" ]; then
@@ -101,7 +101,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='loadgen:snap-clone-ext4
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_loadgen_ext4_rc_val=$(echo $?)
 if [ "$app_loadgen_ext4_rc_val" != "0" ]; then
@@ -126,6 +126,7 @@ cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_ex
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-snapshot-/generateName: snapshot-zfspv-ext4/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
 -e 's/name: zfspv-snapshot/name: snapshot-ext4/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
@@ -154,10 +155,10 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snapshot-ext4' job
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_ext4_rc_val=$(echo $?)
-if [ "$zfspv_snapshot_ext4_rc_val" -eq "0" ]; then
+if [ "$zfspv_snapshot_ext4_rc_val" != "0" ]; then
 app_deprovision_ext4
 fi
 
@@ -180,6 +181,7 @@ cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_ext4
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-ext4/g' \
 -e 's/name: zfspv-clone/name: clone-zfspv-ext4/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-ext4/}' \
@@ -198,7 +200,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-zfspv-ext4' 
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_ext4_rc_val=$(echo $?)
 if [ "$zfspv_clone_ext4_rc_val" != "0" ]; then
@@ -225,6 +227,7 @@ cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_ext4
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-clone-/generateName: clone-ext4-deprovision-/g' \
 -e '/labels:/{n;s/  name: zfspv-clone/  name: clone-ext4-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-ext4/}' \
@@ -249,7 +252,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-ext4-deprovi
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_ext4_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_clone_ext4_deprovision_rc_val" != "0" ]; then
@@ -276,6 +279,7 @@ cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_ex
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-snapshot-/generateName: snap-ext4-deprovision-/g' \
 -e '/labels:/{n;s/  name: zfspv-snapshot/  name: snap-ext4-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-ext4/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-ext4/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
 -e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
@@ -298,7 +302,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snap-ext4-deprovis
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_ext4_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_ext4_deprovision_rc_val" != "0" ]; then
@@ -342,7 +346,7 @@ bash ../openebs-nativek8s/utils/litmus_job_runner label='app:dep-snap-clone-ext4
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
-bash openebs-nativek8s/utils/event_updater jobname:s3-j10-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash openebs-nativek8s/utils/event_updater jobname:s3-j3-snap-clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_ext4_rc_val=$(echo $?)
 
@@ -355,11 +359,11 @@ if [ "$app_deprovision_ext4_rc_val" -eq "0" ] &&
    [ "$app_deploy_ext4_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j10-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 else
 ## Update the e2e-result-custom-resources for the job
-bash openebs-nativek8s/utils/e2e-cr jobname:s3-j10-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 fi
 

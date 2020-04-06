@@ -70,35 +70,41 @@ ZFS-LocalPV PROVISIONER:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
 
+ZFSPV-SNAPSHOT-CLONE:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
+
+ZFSPV-SNAPSHOT-CLONE-ext4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
+
+ZFSPV-SNAPSHOT-CLONE-xfs:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
+
 ZFS-VOLUME-RESIZE:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
 
-ZFSPV-SNAPSHOT:
+ZFS-VOLUME-RESIZE-ext4:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
-
-ZFSPV-CLONE:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
 
 ZFS-VOLUME-RESIZE-xfs:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
-
-ZFS-VOLUME-RESIZE-ext4:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
 
 ZV-PROPERTY-MODIFY:
   extends: .func_test_template
