@@ -171,7 +171,7 @@ fi
 zfspv_clone_ext4() {
 
 ## Generate the test name to run litmusbook for creating zfspv-clone
-run_id="ext4";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
+run_id="ext4";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
 echo $test_name
 cd e2e-tests
 
@@ -191,6 +191,11 @@ sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-ext4/g' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_ext4.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_ext4.yml
 
 cat clone_ext4.yml
 
