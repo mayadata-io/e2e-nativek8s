@@ -195,7 +195,7 @@ bash openebs-nativek8s/utils/event_updater jobname:s3-j2-zfs-vol-resize $test_na
 app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" -eq "0" ] &&
-   [ "$zv_properties_rc_val" -eq "0" ] &&
+   [ "$zv_properties_verify_rc_val" -eq "0" ] &&
    [ "$csi_vol_resize_rc_val" -eq "0" ] &&
    [ "$app_deploy_rc_val" -eq "0" ]; then
 

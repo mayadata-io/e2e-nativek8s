@@ -75,18 +75,6 @@ ZFS-VOLUME-RESIZE:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
-    
-ZFS-VOLUME-RESIZE-XFS:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
-
-ZFS-VOLUME-RESIZE-ext4:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
 
 ZFSPV-SNAPSHOT:
   extends: .func_test_template
@@ -99,7 +87,37 @@ ZFSPV-CLONE:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-clone/ZFSPV-clone
-    
+
+ZFS-VOLUME-RESIZE-xfs:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
+
+ZFS-VOLUME-RESIZE-ext4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+
+ZV-PROPERTY-MODIFY:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
+
+ZV-PROPERTY-MODIFY-ext4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
+
+ZV-PROPERTY-MODIFY-xfs:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
+
 ##################################
 
 # .cleanup_test_template:
