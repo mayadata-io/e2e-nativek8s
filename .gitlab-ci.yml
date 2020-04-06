@@ -73,8 +73,8 @@ ZFS-LocalPV PROVISIONER:
 ZFSPV-SNAPSHOT-CLONE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot/ZFSPV-snapshot
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
 
 ZFSPV-SNAPSHOT-CLONE-ext4:
   extends: .func_test_template

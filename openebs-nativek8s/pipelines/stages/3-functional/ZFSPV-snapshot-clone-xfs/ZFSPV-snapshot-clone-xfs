@@ -171,7 +171,7 @@ fi
 zfspv_clone_xfs() {
 
 ## Generate the test name to run litmusbook for creating zfspv-clone
-run_id="xfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata="")
+run_id="xfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
 echo $test_name
 cd e2e-tests
 
@@ -191,6 +191,11 @@ sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-xfs/g' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_xfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_xfs.yml
 
 cat clone_xfs.yml
 
