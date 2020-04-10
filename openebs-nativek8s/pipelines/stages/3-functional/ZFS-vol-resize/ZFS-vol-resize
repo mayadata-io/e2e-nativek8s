@@ -162,7 +162,7 @@ fi
 app_deprovision() {
 
 ## Generate test name for running litmusbook for generate load on application
-run_id="deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+run_id="zfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
 echo $test_name
 
 # copy the content of workload run_litmus_test.yml into a temporary file to update the test specific parameters.
