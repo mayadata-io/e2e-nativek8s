@@ -24,6 +24,7 @@ current_time=$(eval $time)
 
 ## Create the e2e-result-custom-resources for the jobs
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j1-zfspv-provisioner jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:zfs-ctrl-high-availability jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j2-zfspv-snapshot-clone jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-snap-clone-xfs jobphase:Waiting
