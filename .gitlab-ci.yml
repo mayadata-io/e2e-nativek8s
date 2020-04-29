@@ -1,0 +1,199 @@
+## Define the stages & order of execution
+
+stages:
+    - CLUSTER-SETUP
+    - PROVIDER-INFRA-SETUP
+    - APP-DEPLOY
+    - UPGRADE-ZFSLOCALPV
+    - FUNCTIONAL-TEST
+    - CLUSTER-CLEANUP
+
+#################################################################################
+
+KUBEADM-CLUSTER:
+    image: openebs/openshift-ci:latest
+    stage: CLUSTER-SETUP
+    tags:
+        - k8s-native
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
+        - ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
+
+#################################################################################
+
+ZFS-LocalPV-PROVISIONER:
+    image: openebs/openshift-ci:latest
+    stage: PROVIDER-INFRA-SETUP
+    dependencies:
+        - KUBEADM-CLUSTER
+    tags:
+        - k8s-native
+    script: 
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/2-zfs-localpv-provisioner/zfs-localpv-provisioner
+        - ./openebs-nativek8s/pipelines/stages/2-zfs-localpv-provisioner/zfs-localpv-provisioner
+
+ZFS-CONTROLLER-HA:
+    image: openebs/openshift-ci:latest
+    stage: PROVIDER-INFRA-SETUP
+    dependencies: 
+        - KUBEADM-CLUSTER
+    tags:
+        - k8s-native
+    script: 
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/2-zfs-localpv-provisioner/zfs-controller-HA
+        - ./openebs-nativek8s/pipelines/stages/2-zfs-localpv-provisioner/zfs-controller-HA
+
+#################################################################################
+
+.app_deploy_template:
+    image: openebs/openshift-ci:latest
+    stage: APP-DEPLOY
+    tags: 
+        - k8s-native
+    dependencies:
+        - ZFS-LocalPV-PROVISIONER
+
+APP-ZFS-VOL-RESIZE:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize
+
+APP-ZFS-VOL-RESIZE-ext4:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize-ext4
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize-ext4
+
+APP-ZFS-VOL-RESIZE-xfs:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize-xfs
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfs-vol-resize-xfs
+
+APP-ZFSPV-SNAPSHOT:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot
+
+APP-ZFSPV-SNAPSHOT-ext4:
+    extends: .app_deploy_template
+    script: 
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot-ext4
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot-ext4
+
+APP-ZFSPV-SNAPSHOT-xfs:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot-xfs
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zfspv-snapshot-xfs
+
+APP-ZV-PROPERTY-MODIFY:
+    extends: .app_deploy_template
+    script: 
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify
+
+APP-ZV-PROPERTY-MODIFY-ext4:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify-ext4
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify-ext4
+
+APP-ZV-PROPERTY-MODIFY-xfs:
+    extends: .app_deploy_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify-xfs
+        - ./openebs-nativek8s/pipelines/stages/3-app-deploy/app-zv-property-modify-xfs
+
+#################################################################################
+
+UPGRADE-ZFSLocalPV:
+    image: openebs/openshift-ci:latest
+    stage: UPGRADE-ZFSLOCALPV
+    tags:
+        - k8s-native
+    dependencies:
+        - ZFS-LocalPV-PROVISIONER
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/4-upgrade/upgrade-zfslocalpv
+        - ./openebs-nativek8s/pipelines/stages/4-upgrade/upgrade-zfslocalpv
+
+#################################################################################
+
+.func_test_template:
+    image: openebs/openshift-ci:latest
+    stage: FUNCTIONAL-TEST
+    tags:
+        - k8s-native
+    dependencies:
+        - ZFS-LocalPV-PROVISIONER
+
+ZFS-VOL-RESIZE:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize
+
+ZFS-VOL-RESIZE-ext4:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize-ext4
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize-ext4
+
+ZFS-VOL-RESIZE-xfs:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize-xfs
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfs-vol-resize-xfs
+
+ZFSPV-CLONE:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone
+
+ZFSPV-CLONE-ext4:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone-ext4
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone-ext4
+
+ZFSPV-CLONE-xfs:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone-xfs
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zfspv-clone-xfs
+
+ZV-PROPERTY-MODIFY:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify
+
+ZV-PROPERTY-MODIFY-ext4:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify-ext4
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify-ext4
+
+ZV-PROPERTY-MODIFY-xfs:
+    extends: .func_test_template
+    script:
+        - chmod 755 ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify-xfs
+        - ./openebs-nativek8s/pipelines/stages/5-functional/zv-property-modify-xfs
+
+#################################################################################
+
+CLEANUP-CLUSTER:
+    when: always
+    image: openebs/openshift-ci:latest
+    dependencies:
+      - ZFS-LocalPV-PROVISIONER
+    stage: CLUSTER-CLEANUP
+    script:
+      - chmod 755 ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup
+      - ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup
+
+
