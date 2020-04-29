@@ -1,0 +1,57 @@
+#!/bin/bash
+
+current_time="$(date)"
+echo $current_time
+
+echo "***Checking the cluster is Engaged or not***"
+
+state="sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'ls | grep e2e-nativek8s'"
+cluster_state=$(eval $state)
+
+while [ "${cluster_state}" == "e2e-nativek8s" ]; do
+  echo "***cluster is Engaged******"
+  wait=1
+  cluster_state=$(eval $state)
+  sleep 30
+done
+
+if [ "$wait" == "1" ]; then
+sleep 120
+fi
+
+echo "***Checking the Cluster's Health***"
+
+echo "***Checking for the number of nodes in ready state***"
+ready_nodes=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port kubectl get nodes --no-headers | grep -v NotReady | wc -l)
+
+git_token=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cat ~/.profile | grep github_token | cut -d= -f2')
+gittoken=$(echo $git_token | tr -d '"')
+
+if [ "$ready_nodes" -eq 4 ]; then
+echo "Number of nodes in ready state is $ready_nodes"
+echo "***Cluster is in Healthy state***"
+
+echo "***Dumping cluster state***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port kubectl get nodes
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port kubectl get pods --all-namespaces
+
+echo "***Cloning e2e-nativek8s repo***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'git clone -b release-branch https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git clone https://github.com/openebs/e2e-tests.git'
+
+echo "***Applying the e2e-CRD's yaml***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s/openebs-nativek8s && kubectl apply -f ./utils/e2e-crd.yml'
+
+echo "***Applying rbac and crds yaml***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s/e2e-tests/hack && kubectl apply -f rbac.yaml && kubectl apply -f crds.yaml'
+
+echo "**Copying kube config for e2e-tests in litmus namespace***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cp ~/.kube/config admin.conf && kubectl create cm kubeconfig --from-file=admin.conf -n litmus'
+
+else
+echo "All nodes are not ready"
+echo "***Cluster is in Unhealthy state***"
+echo "***cloning e2e-nativek8s repo***"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'git clone -b release-branch https://github.com/mayadata-io/e2e-nativek8s.git'
+exit 1;
+fi

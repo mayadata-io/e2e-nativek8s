@@ -1,0 +1,388 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_deploy_xfs_rc_val=1
+app_loadgen_xfs_rc_val=1
+zfspv_snapshot_xfs_rc_val=1
+zfspv_clone_xfs_rc_val=1
+zfspv_clone_xfs_deprovision_rc_val=1
+zfspv_snapshot_xfs_deprovision_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+
+}
+
+###########################################################
+# Deploy percona application on ZFSPV when fstype is xfs #
+###########################################################
+
+app_deploy_xfs() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+source ~/.profile
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:s3-j1-zfspv-provisioner
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-snap-clone-xfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="xfs-snap-clone";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of deployers run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/deployers/run_litmus_test.yml percona_xfs_snap_clone.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: snap-clone-xfs/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-xfs-snap-clone-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-xfs/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: snap-clone-xfs/g' percona_xfs_snap_clone.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_xfs_snap_clone.yml
+
+cat percona_xfs_snap_clone.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:snap-clone-xfs' job=percona_xfs_snap_clone.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_xfs_rc_val=$(echo $?)
+if [ "$app_deploy_xfs_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+###################################
+# Loadgen on Percona application  #
+###################################
+
+app_loadgen_xfs() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="xfs-snap-clone";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-loadgen metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/workload/run_litmus_test.yml loadgen_xfs_snap_clone.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: snap-clone-xfs/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-xfs-snap-clone-/g' \
+-e 's/value: app-percona-ns/value: snap-clone-xfs/g' loadgen_xfs_snap_clone.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' loadgen_xfs_snap_clone.yml
+
+cat loadgen_xfs_snap_clone.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='loadgen:snap-clone-xfs' job=loadgen_xfs_snap_clone.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_loadgen_xfs_rc_val=$(echo $?)
+if [ "$app_loadgen_xfs_rc_val" != "0" ]; then
+app_deprovision_xfs
+fi
+
+}
+
+##############################
+# Create zfspv-snapshot-xfs #
+##############################
+
+zfspv_snapshot_xfs() { 
+  
+## Generate test name for running litmusbook for creating zfspv snapshot
+run_id="xfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_xfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: snapshot-zfspv-xfs/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-xfs/g' \
+-e 's/name: zfspv-snapshot/name: snapshot-xfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-xfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-xfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' snap_xfs.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: snap_clone_xfs
+' snap_xfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' snap_xfs.yml
+
+cat snap_xfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snapshot-xfs' job=snap_xfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_snapshot_xfs_rc_val=$(echo $?)
+if [ "$zfspv_snapshot_xfs_rc_val" != "0" ]; then
+app_deprovision_xfs
+fi
+
+}
+
+###########################
+# create zfspv-clone-xfs #
+###########################
+
+zfspv_clone_xfs() {
+
+## Generate the test name to run litmusbook for creating zfspv-clone
+run_id="xfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_xfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-xfs/g' \
+-e 's/name: zfspv-clone/name: clone-zfspv-xfs/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-xfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-xfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-xfs/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-xfs/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_xfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_xfs.yml
+
+cat clone_xfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-zfspv-xfs' job=clone_xfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_clone_xfs_rc_val=$(echo $?)
+if [ "$zfspv_clone_xfs_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision_xfs
+app_deprovision_xfs
+fi
+
+}
+
+################################
+# Deprovision zfspv-clone-xfs #
+################################
+
+zfspv_clone_xfs_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv clone
+run_id="xfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml clone_xfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: clone-xfs-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-clone/  name: clone-xfs-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-xfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-xfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-xfs/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-xfs/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: percona-clone/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_xfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_xfs_deprovision.yml
+
+cat clone_xfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-xfs-deprovision' job=clone_xfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_clone_xfs_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_clone_xfs_deprovision_rc_val" != "0" ]; then
+zfspv_snapshot_deprovision_xfs
+app_deprovision_xfs
+fi
+
+}
+
+###################################
+# Deprovision zfspv-snapshot-xfs #
+###################################
+
+zfspv_snapshot_xfs_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
+run_id="xfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml snap_xfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: snap-xfs-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-snapshot/  name: snap-xfs-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-xfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: snap-clone-xfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snapshot-xfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' snap_xfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' snap_xfs_deprovision.yml
+
+cat snap_xfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snap-xfs-deprovision' job=snap_xfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_snapshot_xfs_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_snapshot_xfs_deprovision_rc_val" != "0" ]; then
+app_deprovision_xfs
+fi
+
+}
+
+###########################
+# Deprovision Application #
+###########################
+
+app_deprovision_xfs() {
+  
+## Generate test name to run litmusbook for deprovisioning the percona application
+run_id="xfs-snap-clone-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/deployers/run_litmus_test.yml percona_xfs_snap_clone_dep.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: dep-snap-clone-xfs/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-snap-clone-xfs-dep-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-xfs/g' \
+-e 's/value: provision/value: deprovision/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: snap-clone-xfs/g' percona_xfs_snap_clone_dep.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_xfs_snap_clone_dep.yml
+
+cat percona_xfs_snap_clone_dep.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:dep-snap-clone-xfs' job=percona_xfs_snap_clone_dep.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:s3-j4-snap-clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_xfs_rc_val=$(echo $?)
+
+if [ "$app_deprovision_xfs_rc_val" -eq "0" ] &&
+   [ "$zfspv_snapshot_xfs_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_xfs_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_clone_xfs_rc_val" -eq "0" ] &&
+   [ "$zfspv_snapshot_xfs_rc_val" -eq "0" ] &&
+   [ "$app_loadgen_xfs_rc_val" -eq "0" ] &&
+   [ "$app_deploy_xfs_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-snap-clone-xfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-snap-clone-xfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+exit 1;
+fi
+
+}
+
+
+if [ "$1" == "run_job" ];then
+  app_deploy_xfs $2 $3 $4 $5
+  app_loadgen_xfs
+  zfspv_snapshot_xfs
+  zfspv_clone_xfs
+  zfspv_clone_xfs_deprovision
+  zfspv_snapshot_xfs_deprovision
+  app_deprovision_xfs
+else
+  connect_cluster
+fi
