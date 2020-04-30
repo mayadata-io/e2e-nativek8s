@@ -64,4 +64,3 @@ if [ "$1" == "run_job" ];then
 else
   connect_cluster
 fi
-
