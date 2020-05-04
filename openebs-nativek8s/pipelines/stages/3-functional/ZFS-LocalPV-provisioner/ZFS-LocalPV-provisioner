@@ -2,7 +2,7 @@
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_BRANCH'"' '"'$ZFS_DRIVER_TAG'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_BRANCH'"' '"'$ZFS_DRIVER_IMAGE'"'
 
 }
 
@@ -16,7 +16,7 @@ job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 zfs_branch=$(echo $4)
-zfs_driver_tag=$(echo $5)
+zfs_driver_image=$(echo $5)
 source ~/.profile
 
 time="date"
@@ -47,7 +47,7 @@ cp providers/zfs-localpv-provisioner/run_litmus_test.yml zfs_pv_provisioner.yml
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc/g}' \
 -e "/name: ZFS_BRANCH/{n;s/.*/            value: ${zfs_branch}/g}" \
--e "/name: ZFS_DRIVER_TAG/{n;s/.*/            value: ${zfs_driver_tag}/g}" \
+-e "/name: ZFS_DRIVER_IMAGE/{n;s/.*/            value: ${zfs_driver_image}/g}" \
 -e '/name: POOL_NAME/{n;s/.*/            value: zfs-test-pool/g}' \
 -e '/name: POOL_TYPE/{n;s/.*/            value: striped/g}' \
 -e '/name: ACTION/{n;s/.*/            value: provision/g}' \
