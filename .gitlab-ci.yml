@@ -70,6 +70,12 @@ ZFS-LocalPV PROVISIONER:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
 
+ZFS-LocalPV-CONTROLLER-HA:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
+    
 ZFSPV-SNAPSHOT-CLONE:
   extends: .func_test_template
   script:
