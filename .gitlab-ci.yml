@@ -193,7 +193,5 @@ CLEANUP-CLUSTER:
       - ZFS-LocalPV-PROVISIONER
     stage: CLUSTER-CLEANUP
     script:
-      - chmod 755 ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup
-      - ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup
-
-
+      - chmod 755 ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup/cluster-cleanup
+      - ./openebs-nativek8s/pipelines/stages/6-cleanup/cluster-cleanup/cluster-cleanup
