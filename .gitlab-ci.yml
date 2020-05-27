@@ -169,13 +169,13 @@ ZFS-DOCKER-RESTART:
   extends: .infra_chaos_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
-    - ./ope-nebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
+    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
   
 ZFS-KUBELET-RESTART:
   extends: .infra_chaos_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
-    - ./ope-nebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
+    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
 
 ##################################
 
