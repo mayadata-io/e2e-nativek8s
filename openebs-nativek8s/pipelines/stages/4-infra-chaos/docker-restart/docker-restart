@@ -109,7 +109,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-docker-restart $test_name
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deploy
+app_deprovision
 fi
 
 }
