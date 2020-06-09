@@ -132,6 +132,7 @@ sed -i -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/g}' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs-kubelet/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/g}' \
+-e '/name: USERNAME/{n;s/.*/            value: k8s/g}' \
 -e '/name: SVC_TYPE/{n;s/.*/            value: kubelet/g}' \
 -e 's/password:/password: VGVzdEAxMjM=/g' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' run_zfs_kubelet_restart.yml

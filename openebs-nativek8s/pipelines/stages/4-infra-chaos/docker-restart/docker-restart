@@ -134,6 +134,7 @@ sed -i -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/g}' \
 -e 's/generateName: svc-failure-chaos-/generateName: zfs-docker-svc-restart-/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs-docker/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
+-e '/name: USERNAME/{n;s/.*/            value: k8s/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/g}' \
 -e '/name: SVC_TYPE/{n;s/.*/            value: docker/g}' \
 -e 's/password:/password: VGVzdEAxMjM=/g' \
