@@ -4,6 +4,7 @@ stages:
     - CLUSTER-SETUP
     - PROVIDER-INFRA-SETUP
     - FUNCTIONAL-TEST
+    - INFRA-CHAOS
     - OPENEBS-CLEANUP
     - CLUSTER-CLEANUP
 
@@ -161,6 +162,29 @@ ZV-PROPERTY-MODIFY-xfs:
 
 ##################################
 
+.infra_chaos_template:
+  image: openebs/openshift-ci:latest
+  stage: INFRA-CHAOS
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - KUBEADM-CLUSTER
+
+ZFS-DOCKER-RESTART:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
+    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
+  
+ZFS-KUBELET-RESTART:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
+    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
+
+##################################
+
 CLUSTER-DELETE:
   image: openebs/openshift-ci:latest
   stage: CLUSTER-CLEANUP
@@ -170,5 +194,5 @@ CLUSTER-DELETE:
   dependencies:
     - KUBEADM-CLUSTER
   script:
-    - chmod 775 ./openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup
-    - ./openebs-nativek8s/pipelines/stages/4-cleanup/cluster-cleanup/cluster-cleanup
+    - chmod 775 ./openebs-nativek8s/pipelines/stages/5-cleanup/cluster-cleanup/cluster-cleanup
+    - ./openebs-nativek8s/pipelines/stages/5-cleanup/cluster-cleanup/cluster-cleanup
