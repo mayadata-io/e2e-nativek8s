@@ -26,7 +26,7 @@ current_time=$(eval $time)
 bash openebs-nativek8s/utils/pooling jobname:zfs-ctrl-high-availability
 bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-custom-topology jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
-## Generate the test name for running the litmusbook for deploying ZFS LocalPV provisioner
+## Generate the test name for running the litmusbook for performing zfspv-custom-topology support e2e-test
 test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-custom-topology-test metadata="")
 echo $test_name
 
