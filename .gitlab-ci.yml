@@ -76,6 +76,12 @@ ZFS-LocalPV-CONTROLLER-HA:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
+
+ZFSPV-RAW-BLOCK-VOLUME:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
     
 ZFSPV-CUSTOM-TOPOLOGY:
   extends: .func_test_template
