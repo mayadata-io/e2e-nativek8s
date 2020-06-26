@@ -17,6 +17,9 @@ pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 zfs_branch=$(echo $4)
 zfs_driver_image=$(echo $5)
+releaseTag=$(echo $5 | cut -d ":" -f 2)
+echo "releaseTag=$releaseTag"
+
 source ~/.profile
 
 time="date"
