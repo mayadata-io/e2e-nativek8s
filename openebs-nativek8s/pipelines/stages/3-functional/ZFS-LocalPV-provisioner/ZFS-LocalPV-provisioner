@@ -53,6 +53,8 @@ cp providers/zfs-localpv-provisioner/run_litmus_test.yml zfs_pv_provisioner.yml
 sed -i -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc/g}' \
 -e "/name: ZFS_BRANCH/{n;s/.*/            value: ${zfs_branch}/g}" \
 -e "/name: ZFS_DRIVER_IMAGE/{n;s/.*/            value: ${zfs_driver_image}/g}" \
+-e '/name: OS_NAME/{n;s/.*/            value: ubuntu/g}' \
+-e '/name: ZPOOL_CREATION/{n;s/.*/            value: "true"/g}' \
 -e '/name: POOL_NAME/{n;s/.*/            value: zfs-test-pool/g}' \
 -e '/name: POOL_TYPE/{n;s/.*/            value: striped/g}' \
 -e '/name: ACTION/{n;s/.*/            value: provision/g}' \
