@@ -107,6 +107,12 @@ ZFSPV-SNAPSHOT-CLONE-xfs:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
 
+ZFSPV-SNAPSHOT-CLONE-btrfs:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
+
 ZFS-VOLUME-RESIZE:
   extends: .func_test_template
   script:
@@ -142,6 +148,12 @@ ZV-PROPERTY-MODIFY-xfs:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
+  
+ZV-PROPERTY-MODIFY-btrfs:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
 
 ##################################
 
