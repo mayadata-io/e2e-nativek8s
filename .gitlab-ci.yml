@@ -65,13 +65,13 @@ KUBEADM-CLUSTER:
   dependencies:
     - KUBEADM-CLUSTER
 
-ZFS-LocalPV PROVISIONER:
+ZFS-LOCALPV-PROVISIONER-DEPLOY:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
 
-ZFS-LocalPV-CONTROLLER-HA:
+ZFS-LOCALPV-CONTROLLER-HA:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
@@ -83,65 +83,77 @@ ZFSPV-RAW-BLOCK-VOLUME:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
     
-ZFSPV-CUSTOM-TOPOLOGY:
+ZFSPV-CUSTOM-TOPOLOGY-VERIFY:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-custom-topology/ZFSPV-custom-topology
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-custom-topology/ZFSPV-custom-topology
       
-ZFSPV-SNAPSHOT-CLONE:
+ZFSPV-SNAPSHOT-CLONE-ZFS-CREATE:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
 
-ZFSPV-SNAPSHOT-CLONE-ext4:
+ZFSPV-SNAPSHOT-CLONE-EXT4-CREATE:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
 
-ZFSPV-SNAPSHOT-CLONE-xfs:
+ZFSPV-SNAPSHOT-CLONE-XFS-CREATE:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
 
-ZFS-VOLUME-RESIZE:
+ZFSPV-SNAPSHOT-CLONE-BTRFS-CREATE:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
+
+ZFS-VOL-RESIZE-ZFS:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
 
-ZFS-VOLUME-RESIZE-ext4:
+ZFS-VOL-RESIZE-EXT4:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
 
-ZFS-VOLUME-RESIZE-xfs:
+ZFS-VOL-RESIZE-XFS:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
 
-ZV-PROPERTY-MODIFY:
+ZFSPV-PROPERTY-MODIFY-ZFS:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
 
-ZV-PROPERTY-MODIFY-ext4:
+ZFSPV-PROPERTY-MODIFY-EXT4:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
 
-ZV-PROPERTY-MODIFY-xfs:
+ZFSPV-PROPERTY-MODIFY-XFS:
   extends: .func_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
+  
+ZV-PROPERTY-MODIFY-BTRFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
 
 ##################################
 
