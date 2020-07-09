@@ -30,6 +30,8 @@ bash openebs-nativek8s/utils/e2e-cr jobname:s3-j1-zfspv-provisioner jobphase:Wai
 bash openebs-nativek8s/utils/e2e-cr jobname:zfs-ctrl-high-availability jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-custom-topology jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-raw-block-volume jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:snap-clone-btrfs jobphase:Waiting
+bash openebs-nativek8s/utils/e2e-cr jobname:zv-property-modify-btrfs jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j2-zfspv-snapshot-clone jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j3-snap-clone-ext4 jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:s3-j4-snap-clone-xfs jobphase:Waiting
