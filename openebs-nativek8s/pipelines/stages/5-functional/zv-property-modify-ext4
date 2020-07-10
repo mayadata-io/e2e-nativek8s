@@ -39,6 +39,7 @@ cp experiments/functional/zfs-LocalPV/zv-property-runtime-modify/run_litmus_test
 sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: ext4-zv-property-runtime-modify/g' \
 -e 's/name: zv-property-runtime-modify/name: ext4-zv-property-runtime-modify/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-ext4-modify/}' \
+-e '/name: FILE_SYSTEM_TYPE/{n;s/.*/            value: ext4/}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: name=percona/}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/}' \
