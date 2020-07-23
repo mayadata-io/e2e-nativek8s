@@ -31,5 +31,5 @@ The goal of this gitlab stage is to check the health of the on-premise cluster c
 
 | S.No | TID  | Test case description                  |
 | ---- | ---- | ---------------------------------------|
-| 1    | 1C01 | Configure the cluster and get it ready |
+| 1    | 1S01 | Configure the cluster and get it ready |
 

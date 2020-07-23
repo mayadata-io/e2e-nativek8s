@@ -1,4 +1,4 @@
-### 1SCX-cluster-setup
+### 1S01-cluster-setup
 
 #### Description
  
