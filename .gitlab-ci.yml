@@ -155,6 +155,24 @@ ZV-PROPERTY-MODIFY-BTRFS:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
 
+ZFSPV-SHARED-MOUNT-VOLUME-ZFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-zfs/zfspv-shared-mount-zfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-zfs/zfspv-shared-mount-zfs
+
+ZFSPV-SHARED-MOUNT-VOLUME-EXT4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-ext4/zfspv-shared-mount-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-ext4/zfspv-shared-mount-ext4
+
+ZFSPV-SHARED-MOUNT-VOLUME-XFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-xfs/zfspv-shared-mount-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-xfs/zfspv-shared-mount-xfs
+
 ##################################
 
 # .cleanup_test_template:
