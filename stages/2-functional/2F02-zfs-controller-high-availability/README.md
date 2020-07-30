@@ -8,7 +8,7 @@ This test deploys the zfs-controller in high availability (more than one replica
 
 - First deploy the zfs-controller with single replica
 - Then scale the replicas of zfs-controller statefulset and verify the provision of volume when other replica is down.
-- For more detailed README for the test [click here]()
+- For more detailed README for the test [click here](https://github.com/openebs/e2e-tests/experiments/zfs-localpv/functional/zfs-controller-high-availability)
 
 #### Test Results
 
