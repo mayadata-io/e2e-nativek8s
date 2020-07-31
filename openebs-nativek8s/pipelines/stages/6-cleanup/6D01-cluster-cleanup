@@ -1,0 +1,43 @@
+#!/bin/bash
+
+connect_cluster() {
+echo $CI_JOB_ID
+###clone e2e-nativek8s-repo
+echo "cloning e2e-nativek8s repo*************"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $user@$ip -p $port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+}
+
+cleanup_cluster() {
+job_id=$(echo $1)
+
+git clone https://github.com/openebs/e2e-tests.git
+cd e2e-tests
+
+# Replace the VM IP In csv file
+sed -i -e 's/10.12.22.10/10.34.1.220/g' \
+-e 's/10.12.22.11/10.34.1.221/g' \
+-e 's/10.12.22.12/10.34.1.222/g' \
+-e 's/10.12.22.13/10.34.1.223/g' k8s/on-prem/openshift-installer/ip.csv
+
+#Replace the Vm names in csv file
+sed -i -e 's/auto1/Native-k8s-pipeline-master/g' \
+-e 's/auto2/Native-K8s-pipeline-node1/g' \
+-e 's/auto3/Native-K8s-pipeline-node2/g' \
+-e 's/auto4/Native-K8s-pipeline-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
+
+#Replace the snapshot name and exp ip in vars
+sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "kubeadm"/g' \
+-e 's/esx_ip: "10.12.1.1"/esx_ip: "10.44.1.1"/g' k8s/on-prem/openshift-installer/vars.yml
+
+ansible-playbook k8s/on-prem/openshift-installer/revert_cluster_state.yml -vv
+
+#Removimg e2e nativek8s test repo
+cd && rm -rf e2e-nativek8s && rm -rf infra
+}
+
+if [ "$1" == "run_job" ];then
+  cleanup_cluster $2
+else
+  connect_cluster
+fi
