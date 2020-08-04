@@ -38,7 +38,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_zfs.yml
+cp experiments/zfs-localpv/functional/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_zfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/name: shared-mount-volume/name: shared-mount-volume-zfs/g' \
@@ -91,7 +91,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_zfs.yml
+cp experiments/zfs-localpv/functional/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_zfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-snapshot-/generateName: snapshot-zfspv-shared-zfs/g' \
@@ -138,7 +138,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_zfs.yml
+cp experiments/zfs-localpv/functional/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_zfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-shared-zfs/g' \
@@ -188,7 +188,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_zfs_deprovision.yml
+cp experiments/zfs-localpv/functional/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_zfs_deprovision.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-clone-/generateName: zfspv-clone-shared-zfs-deprovision-/g' \
@@ -239,7 +239,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_zfs_deprovision.yml
+cp experiments/zfs-localpv/functional/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_zfs_deprovision.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-snapshot-/generateName: zfspv-snapshot-shared-zfs-deprovision-/g' \
@@ -288,7 +288,7 @@ echo $test_name
 cd e2e-tests
 
 # copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
-cp experiments/functional/zfs-LocalPV/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_zfs_deprovision.yml
+cp experiments/zfs-localpv/functional/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_zfs_deprovision.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/name: shared-mount-volume/name: shared-mount-volume-zfs-deprovision/g' \

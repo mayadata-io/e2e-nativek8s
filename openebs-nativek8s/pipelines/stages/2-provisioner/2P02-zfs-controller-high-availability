@@ -30,7 +30,7 @@ echo $test_name
 
 ## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
 cd e2e-tests
-cp experiments/functional/zfs-LocalPV/zfs-controller-HA/run_litmus_test.yml zfs_ctrl_HA.yml
+cp experiments/zfs-localpv/functional/zfs-controller-high-availability/run_litmus_test.yml zfs_ctrl_HA.yml
 
 cat zfs_ctrl_HA.yml
 

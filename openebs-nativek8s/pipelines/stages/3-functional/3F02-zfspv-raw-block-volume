@@ -33,7 +33,7 @@ echo $test_name
 
 # copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
 cd e2e-tests
-cp experiments/functional/zfs-LocalPV/zfspv-raw-block-volume/run_litmus_test.yml run_raw_block_vol.yml
+cp experiments/zfs-localpv/functional/zfspv-raw-block-volume/run_litmus_test.yml run_raw_block_vol.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: block-vol/g}' \
