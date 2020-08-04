@@ -62,7 +62,7 @@ testResult=$(kubectl get litmusresult ${test_name} --no-headers -o custom-column
 
 current_time=$(eval $time)
 bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-raw-block-volume jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:$testResult
-python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py $job_id 3F01 3-functional "verify the zfspv-raw-block-volume support" $testResult $pipeline_id $current_time $commit_id $gittoken
+python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py $job_id 3F02 3-functional "verify the zfspv-raw-block-volume support" $testResult $pipeline_id $current_time $commit_id $gittoken
 
 if [ "$rc_val" != "0" ]; then
 exit 1;

@@ -1,6 +1,6 @@
 # e2e-nativek8s
 
-This repository's `release-branch` branch contains plateform execution scripts for each indivisual test which is meant to run for inducing chaos and testing zfs-localpv components. It includes several stages to perform different scenraios in end to end work-flow. To see the README's and test results of pipeline switch to the `release-branch` of this repository.
+This repository's `release-branch` branch contains plateform execution scripts for each individual test which is meant to run for inducing chaos and testing zfs-localpv components. It includes several stages to perform different scenraio in end to end work-flow. To see the README's and test results of pipeline switch to the `master` of this repository.
 
 To see the CI/E2E summary of the gitlab pipelines for e2e-nativek8s project visit `openebs.ci` and switch to `k8s` tab under `stable releases` category.
 

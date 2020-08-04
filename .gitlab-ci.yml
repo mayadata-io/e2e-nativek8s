@@ -61,8 +61,8 @@ stages:
 3F02-ZFSPV-RAW-BLOCK-VOLUME:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F02-ZFSPV-RAW-BLOCK-VOLUME
-    - ./openebs-nativek8s/pipelines/stages/3-functional/3F02-ZFSPV-RAW-BLOCK-VOLUME
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
     
 3F03-ZFS-VOLUME-RESIZE-ZFS:
   extends: .func_test_template
