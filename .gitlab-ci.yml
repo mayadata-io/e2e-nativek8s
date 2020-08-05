@@ -27,7 +27,7 @@ stages:
     - k8s-native
   when: always
   dependencies:
-    - KUBEADM-CLUSTER
+    - 1S01-KUBEADM-CLUSTER
 
 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY:
   extends: .provisioner_test_template
