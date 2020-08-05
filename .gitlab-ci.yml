@@ -2,58 +2,45 @@
 
 stages:
     - CLUSTER-SETUP
-    - PROVIDER-INFRA-SETUP
-    - FUNCTIONAL-TEST
+    - PROVISIONER
+    - FUNCTIONAL
     - INFRA-CHAOS
-    - OPENEBS-CLEANUP
-    - CLUSTER-CLEANUP
+    - CLEANUP
 
 ##################################
 
-KUBEADM-CLUSTER:
+1S01-KUBEADM-CLUSTER:
   image: openebs/openshift-ci:latest
   stage: CLUSTER-SETUP 
   tags: 
     - k8s-native
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
-    - ./openebs-nativek8s/pipelines/stages/1-cluster-setup/cluster-setup
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/1-cluster-setup/1S01-cluster-setup
+    - ./openebs-nativek8s/pipelines/stages/1-cluster-setup/1S01-cluster-setup
 
 ##################################
 
-# OPENEBS-DEPLOY:
-#   image: openebs/openshift-ci:latest
-#   stage: PROVIDER-INFRA-SETUP
-#   tags:
-#     - k8s-native
-#   dependencies:
-#     - KUBEADM-CLUSTER
-#   script: 
-#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
-#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/deploy-openebs/deploy-openebs
+.provisioner_test_template:
+  image: openebs/openshift-ci:latest
+  stage: PROVISIONER
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - KUBEADM-CLUSTER
 
-# OPENEBS-SC-DEPLOY:
-#   image: openebs/openshift-ci:latest
-#   stage: PROVIDER-INFRA-SETUP
-#   tags:
-#     - k8s-native
-#   dependencies:
-#     - KUBEADM-CLUSTER
-#   script:
-#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
-#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/storage-policies/openebs-sc
+2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY:
+  extends: .provisioner_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-provisioner/2P01-zfs-localpv-provisioner
+    - ./openebs-nativek8s/pipelines/stages/2-provisioner/2P01-zfs-localpv-provisioner
 
-# SPC-STRIPED-POOL:
-#   image: openebs/openshift-ci:latest
-#   stage: PROVIDER-INFRA-SETUP
-#   tags:
-#     - k8s-native
-#   dependencies:
-#     - KUBEADM-CLUSTER
-#   script:
-#     - chmod 755 ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
-#     - ./openebs-nativek8s/pipelines/stages/2-Infra-setup/create-striped-pool/create-striped-pool
-
+2P02-ZFS-LOCALPV-CONTROLLER-HA:
+  extends: .provisioner_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/2-provisioner/2P02-zfs-controller-high-availability
+    - ./openebs-nativek8s/pipelines/stages/2-provisioner/2P02-zfs-controller-high-availability
+    
 ##################################
 
 .func_test_template:
@@ -63,138 +50,103 @@ KUBEADM-CLUSTER:
     - k8s-native
   when: always
   dependencies:
-    - KUBEADM-CLUSTER
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
 
-ZFS-LOCALPV-PROVISIONER-DEPLOY:
+3F01-ZFSPV-CUSTOM-TOPOLOGY-VERIFY:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-LocalPV-provisioner/ZFS-LocalPV-provisioner
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F01-zfspv-custom-topology-verify
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F01-zfspv-custom-topology-verify
 
-ZFS-LOCALPV-CONTROLLER-HA:
+3F02-ZFSPV-RAW-BLOCK-VOLUME:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA
-
-ZFSPV-RAW-BLOCK-VOLUME:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-raw-block-volume/ZFSPV-raw-block-volume
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
     
-ZFSPV-CUSTOM-TOPOLOGY-VERIFY:
+3F03-ZFS-VOLUME-RESIZE-ZFS:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-custom-topology/ZFSPV-custom-topology
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-custom-topology/ZFSPV-custom-topology
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F03-zfs-volume-resize-zfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F03-zfs-volume-resize-zfs
+
+3F04-ZFS-VOLUME-RESIZE-EXT4:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F04-zfs-volume-resize-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F04-zfs-volume-resize-ext4
+
+3F05-ZFS-VOLUME-RESIZE-XFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F05-zfs-volume-resize-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F05-zfs-volume-resize-xfs
+
+3F06-ZFSPV-PROPERTY-MODIFY-ZFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F06-zfspv-property-modify-zfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F06-zfspv-property-modify-zfs
       
-ZFSPV-SNAPSHOT-CLONE-ZFS-CREATE:
+3F07-ZFSPV-PROPERTY-MODIFY-EXT4:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone/ZFSPV-snapshot-clone
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F07-zfspv-property-modify-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F07-zfspv-property-modify-ext4
 
-ZFSPV-SNAPSHOT-CLONE-EXT4-CREATE:
+3F08-ZFSPV-PROPERTY-MODIFY-XFS:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-ext4/ZFSPV-snapshot-clone-ext4
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F08-zfspv-property-modify-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F08-zfspv-property-modify-xfs
 
-ZFSPV-SNAPSHOT-CLONE-XFS-CREATE:
+3F09-ZV-PROPERTY-MODIFY-BTRFS:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-xfs/ZFSPV-snapshot-clone-xfs
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F09-zfspv-property-modify-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F09-zfspv-property-modify-btrfs
 
-ZFSPV-SNAPSHOT-CLONE-BTRFS-CREATE:
+3F10-ZFSPV-SNAPSHOT-CLONE-ZFS-CREATE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFSPV-snapshot-clone-btrfs/ZFSPV-snapshot-clone-btrfs
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F10-zfspv-snapshot-clone-zfs-create
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F10-zfspv-snapshot-clone-zfs-create
 
-ZFS-VOL-RESIZE-ZFS:
+3F11-ZFSPV-SNAPSHOT-CLONE-EXT4-CREATE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize/ZFS-vol-resize
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F11-zfspv-snapshot-clone-ext4-create
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F11-zfspv-snapshot-clone-ext4-create
 
-ZFS-VOL-RESIZE-EXT4:
+3F12-ZFSPV-SNAPSHOT-CLONE-XFS-CREATE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-ext4/ZFS-vol-resize-ext4
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F12-zfspv-snapshot-clone-xfs-create
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F12-zfspv-snapshot-clone-xfs-create
 
-ZFS-VOL-RESIZE-XFS:
+3F13-ZFSPV-SNAPSHOT-CLONE-BTRFS-CREATE:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZFS-vol-resize-xfs/ZFS-vol-resize-xfs
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F13-zfspv-snapshot-clone-btrfs-create
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F13-zfspv-snapshot-clone-btrfs-create
 
-ZFSPV-PROPERTY-MODIFY-ZFS:
+3F14-ZFSPV-SHARED-MOUNT-VOLUME-ZFS:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify/ZV-property-modify
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F14-zfspv-shared-mount-volume-zfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F14-zfspv-shared-mount-volume-zfs
 
-ZFSPV-PROPERTY-MODIFY-EXT4:
+3F15-ZFSPV-SHARED-MOUNT-VOLUME-EXT4:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-ext4/ZV-property-modify-ext4
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F15-zfspv-shared-mount-volume-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F15-zfspv-shared-mount-volume-ext4
 
-ZFSPV-PROPERTY-MODIFY-XFS:
+3F16-ZFSPV-SHARED-MOUNT-VOLUME-XFS:
   extends: .func_test_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-xfs/ZV-property-modify-xfs
-  
-ZV-PROPERTY-MODIFY-BTRFS:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/ZV-property-modify-btrfs/ZV-property-modify-btrfs
-
-ZFSPV-SHARED-MOUNT-VOLUME-ZFS:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-zfs/zfspv-shared-mount-zfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-zfs/zfspv-shared-mount-zfs
-
-ZFSPV-SHARED-MOUNT-VOLUME-EXT4:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-ext4/zfspv-shared-mount-ext4
-    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-ext4/zfspv-shared-mount-ext4
-
-ZFSPV-SHARED-MOUNT-VOLUME-XFS:
-  extends: .func_test_template
-  script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-xfs/zfspv-shared-mount-xfs
-    - ./openebs-nativek8s/pipelines/stages/3-functional/zfspv-shared-mount-xfs/zfspv-shared-mount-xfs
-
-##################################
-
-# .cleanup_test_template:
-#   image: openebs/openshift-ci:latest
-#   stage:  OPENEBS-CLEANUP
-#   tags:
-#     - k8s-native
-#   when: always
-#   dependencies:
-#       - OPENEBS-DEPLOY
-      
-# CLEANUP-SPC-STRIPED-POOL:
-#   extends: .cleanup_test_template
-#   script:
-#     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
-#     - ./openebs-nativek8s/pipelines/stages/4-cleanup/cleanup-spc-striped-pool/cleanup-spc-striped-pool
-
-# OPENEBS-UNINSTALL:
-#   extends: .cleanup_test_template
-#   script:
-#     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
-#     - ./openebs-nativek8s/pipelines/stages/4-cleanup/openebs-uninstall/openebs-uninstall
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
 
 ##################################
 
@@ -205,30 +157,30 @@ ZFSPV-SHARED-MOUNT-VOLUME-XFS:
     - k8s-native
   when: always
   dependencies:
-    - KUBEADM-CLUSTER
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
 
-ZFS-DOCKER-RESTART:
+5I01-NODE-DOCKER-RESTART-ZFS:
   extends: .infra_chaos_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
-    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/docker-restart/docker-restart
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I01-node-docker-restart-zfs
+    - ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I01-node-docker-restart-zfs
   
-ZFS-KUBELET-RESTART:
+5I02-NODE-KUBELET-RESTART-ZFS:
   extends: .infra_chaos_template
   script:
-    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
-    - ./openebs-nativek8s/pipelines/stages/4-infra-chaos/kubelet-restart/kubelet-restart
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I02-node-kubelet-restart-zfs
+    - ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I02-node-kubelet-restart-zfs
 
 ##################################
 
-CLUSTER-DELETE:
+CLUSTER-CLEANUP:
   image: openebs/openshift-ci:latest
-  stage: CLUSTER-CLEANUP
+  stage: CLEANUP
   when: always
   tags:
     - k8s-native
   dependencies:
-    - KUBEADM-CLUSTER
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
   script:
-    - chmod 775 ./openebs-nativek8s/pipelines/stages/5-cleanup/cluster-cleanup/cluster-cleanup
-    - ./openebs-nativek8s/pipelines/stages/5-cleanup/cluster-cleanup/cluster-cleanup
+    - chmod 775 ./openebs-nativek8s/pipelines/stages/6-cleanup/6D01-cluster-cleanup
+    - ./openebs-nativek8s/pipelines/stages/6-cleanup/6D01-cluster-cleanup
