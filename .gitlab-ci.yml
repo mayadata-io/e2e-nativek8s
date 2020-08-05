@@ -45,7 +45,7 @@ stages:
 
 .func_test_template:
   image: openebs/openshift-ci:latest
-  stage: FUNCTIONAL-TEST
+  stage: FUNCTIONAL
   tags:
     - k8s-native
   when: always
