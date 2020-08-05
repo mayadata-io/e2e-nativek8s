@@ -2,7 +2,7 @@
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/ZFS-controller-in-HA/ZFS-controller-in-HA run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/2-provisioner/2P02-zfs-controller-high-availability run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
 
 }
 
@@ -53,7 +53,7 @@ testResult=$(kubectl get litmusresult ${test_name} --no-headers -o custom-column
 
 current_time=$(eval $time)
 bash openebs-nativek8s/utils/e2e-cr jobname:zfs-ctrl-high-availability jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:$testResult
-python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py $job_id 2P02 1-cluster-setup "Deploy zfs-localpv controller statefulset in high availability" $testResult $pipeline_id $current_time $commit_id $gittoken
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 2P02 1-cluster-setup "Deploy zfs-localpv controller statefulset in high availability" $testResult $pipeline_id $current_time $commit_id $gittoken
 
 if [ "$rc_val" != "0" ]; then
 exit 1;

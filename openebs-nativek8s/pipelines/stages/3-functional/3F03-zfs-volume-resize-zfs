@@ -202,12 +202,12 @@ if [ "$app_deprovision_rc_val" -eq "0" ] &&
 
 ## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:zfs-volume-resize-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
-python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py $job_id 3F03 3-functional "zv property verify and zfs volume resize when fstype is zfs" Pass $pipeline_id $current_time $commit_id $gittoken
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F03 3-functional "zv property verify and zfs volume resize when fstype is zfs" Pass $pipeline_id $current_time $commit_id $gittoken
 
 else
 ## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:zfs-volume-resize-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
-python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py $job_id 3F03 3-functional "zv property verify and zfs volume resize when fstype is zfs" Fail $pipeline_id $current_time $commit_id $gittoken
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F03 3-functional "zv property verify and zfs volume resize when fstype is zfs" Fail $pipeline_id $current_time $commit_id $gittoken
 exit 1;
 fi
 
