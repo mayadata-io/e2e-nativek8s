@@ -13,5 +13,6 @@ This test checks the health of the cluster, status of nodes and clones the requi
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     docs.openebs.io           |  configre the cluster and get it ready           | Thu Aug 6 19:34:27 IST 2020  | pass |
 |     docs.openebs.io           |  configure the cluster and get it ready           | Thu Aug 6 19:34:27 IST 2020  | pass |
 |     docs.openebs.io           |  configure the cluster and get it ready           | Thu Aug 6 19:34:27 IST 2020  | pass |
