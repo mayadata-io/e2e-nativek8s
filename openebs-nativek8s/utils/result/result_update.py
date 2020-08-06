@@ -49,7 +49,7 @@ git_auth = github.Github(token)
 repo = git_auth.get_repo("{owner}/{repo_name}".format(owner=username, repo_name=repos))
 
 # default github path appending stage name : 1-cluster-setup/2-setup/3-functional/4-chaos/5-cleanup
-default_path = 'openebs-nativek8s/pipelines/OpenEBS-base/stages/{}'.format(stage)
+default_path = 'stages/{}'.format(stage)
 job_dir = ""
 # list of job folders in default_path
 dir_contents = repo.get_dir_contents(default_path)
@@ -69,7 +69,7 @@ if  flag == 0:
  exit()
 
 # creating respective gitlab job directory's github repo path       
-job_dir_path = "openebs-nativek8s/pipelines/OpenEBS-base/stages/{}/{}".format(stage,job_dir)
+job_dir_path = "stages/{}/{}".format(stage,job_dir)
 
 # Check if the readme.md file present in job_dir_path
 dir_contents = repo.get_dir_contents(job_dir_path)
@@ -84,7 +84,7 @@ if  flag == 0:
  exit()
 
 # readme.md file path
-file_path = "openebs-nativek8s/pipelines/OpenEBS-base/stages/{}/{}/README.md".format(stage, job_dir)
+file_path = "stages/{}/{}/README.md".format(stage, job_dir)
 print(file_path)
 # print github url for respective job's readme.md
 print("https://github.com/"+username+'/'+repos+'/'+"tree/master/"+file_path)
