@@ -33,11 +33,11 @@ file_update_retries = 5
 # github job log url using job_id
 job_url = "<a href=\"https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/{0}\">{0}</a>".format(job_id)
 
-# kibana url for the respective job using commit_sha and pipeline_id
-efk_url = "\"https://e2e-logs.openebs100.io/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:cluster-logs,key:commit_id,negate:!f,params:(query:{0},type:phrase),type:phrase,value:{0}),query:(match:(commit_id:(query:{0},type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:cluster-logs,key:pipeline_id,negate:!f,params:(query:{1},type:phrase),type:phrase,value:{1}),query:(match:(pipeline_id:(query:{1},type:phrase))))),index:cluster-logs,interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))\"".format(commit_sha,pipeline_id)
+# # kibana url for the respective job using commit_sha and pipeline_id
+# efk_url = "\"https://e2e-logs.openebs100.io/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:cluster-logs,key:commit_id,negate:!f,params:(query:{0},type:phrase),type:phrase,value:{0}),query:(match:(commit_id:(query:{0},type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:cluster-logs,key:pipeline_id,negate:!f,params:(query:{1},type:phrase),type:phrase,value:{1}),query:(match:(pipeline_id:(query:{1},type:phrase))))),index:cluster-logs,interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))\"".format(commit_sha,pipeline_id)
 
 # creating html link from kibana job url: efk_url
-efk_link = "<a href={0}>{1}</a>".format(efk_url, test_result)
+# efk_link = "<a href={0}>{1}</a>".format(efk_url, test_result)
 
 # github repo owner name 
 username = "mayadata-io"
@@ -102,17 +102,17 @@ def fetch_file_content():
     
     # creating result's table for first job result entry by checking if the last line of the Readme.md has `Test Result` or not
     if 'test result' in last_line:
-        updated_file_content =  '| Job ID |   Test Description         | Execution Time |Test Result   |\n'
+        updated_file_content =  '| Job ID  |      Test Description         | Execution Time |   Test Result   |\n'
         updated_file_content = updated_file_content + (' |---------|---------------------------| --------------|--------|\n')
-        updated_file_content = updated_file_content + (' |    {}   |  {}           |  {}     |{}  |\n'.format(job_url, test_desc, time_stamp, efk_link))
+        updated_file_content = updated_file_content + (' |    {}   |  {}           |  {}     |{}  |\n'.format(job_url, test_desc, time_stamp, test_result))
         index = len(content_list)
         content_list.insert(index, updated_file_content)
         updated_file_content = ('\n').join(content_list)
 
      # updating result's table if the table is already there
     else:
-        new_job = '|     {}           |  {}           | {}  | {} |'.format(job_url,test_desc,time_stamp ,efk_link)
-        index = content_list.index('| Job ID |   Test Description         | Execution Time |Test Result   |')
+        new_job = '|     {}           |  {}           | {}  | {} |'.format(job_url,test_desc,time_stamp ,test_result)
+        index = content_list.index('| Job ID  |      Test Description         | Execution Time |   Test Result   |')
         content_list.insert(index+2,new_job)
         updated_file_content = ('\n').join(content_list)
 
