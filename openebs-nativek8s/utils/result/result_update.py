@@ -102,7 +102,7 @@ def fetch_file_content():
     
     # creating result's table for first job result entry by checking if the last line of the Readme.md has `Test Result` or not
     if 'test result' in last_line:
-        updated_file_content =  '| Job ID |   Test Description         | Execution Time |Test Result   |\n'
+        updated_file_content =  '| Job ID  |      Test Description         | Execution Time |   Test Result   |\n'
         updated_file_content = updated_file_content + (' |---------|---------------------------| --------------|--------|\n')
         updated_file_content = updated_file_content + (' |    {}   |  {}           |  {}     |{}  |\n'.format(job_url, test_desc, time_stamp, test_result))
         index = len(content_list)
@@ -112,7 +112,7 @@ def fetch_file_content():
      # updating result's table if the table is already there
     else:
         new_job = '|     {}           |  {}           | {}  | {} |'.format(job_url,test_desc,time_stamp ,test_result)
-        index = content_list.index('| Job ID |   Test Description         | Execution Time |Test Result   |')
+        index = content_list.index('| Job ID  |      Test Description         | Execution Time |   Test Result   |')
         content_list.insert(index+2,new_job)
         updated_file_content = ('\n').join(content_list)
 
