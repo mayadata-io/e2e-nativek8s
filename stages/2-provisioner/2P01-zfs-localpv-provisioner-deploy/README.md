@@ -9,7 +9,7 @@ This test deploys the zfs-localpv components in the `kube-system` namespace whic
 - First zpool is created on each compute nodes.
 - Then apply the zfs-operator file for desired version
 - Verify the running state of zfs-localpv components and create storage-classes.
-- To get the detailed README for this test [click here](https://github.com/openebs/e2e-tests/experiments/zfs-localpv/zfs-localpv-provisioner).
+- To get the detailed README for this test [click here](https://github.com/openebs/e2e-tests/tree/master/experiments/zfs-localpv/zfs-localpv-provisioner).
 
 #### Test Results
 
