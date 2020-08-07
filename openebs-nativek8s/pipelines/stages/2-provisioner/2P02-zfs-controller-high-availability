@@ -16,6 +16,7 @@ job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 source ~/.profile
+gittoken=$(echo "$github_token")
 
 time="date"
 current_time=$(eval $time)

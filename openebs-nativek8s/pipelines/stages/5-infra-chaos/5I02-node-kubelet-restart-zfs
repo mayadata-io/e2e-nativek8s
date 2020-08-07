@@ -25,6 +25,7 @@ pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 observer_node=$4
 source ~/.profile
+gittoken=$(echo "$github_token")
 
 time="date"
 current_time=$(eval $time)
