@@ -34,7 +34,7 @@ echo $test_name
 
 ## copy the content of run_litmus_test.yml into a temporary file to update the test specific parameters.
 cd e2e-tests
-cp experiments/functional/zfs-LocalPV/zv-properties-verify/run_litmus_test.yml zv_properties_zfs.yml
+cp experiments/zfs-localpv/functional/zv-properties-verify/run_litmus_test.yml zv_properties_zfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs/g}' \
