@@ -2,7 +2,7 @@
 
 #### Description
 
-This functional test validates the raw block volume support for zfs-localpv. For detailed README for this test [click here](https://github.com/openebs/e2e-tests/tree/master/experiments/zfs-localpv/functional/zfspv-raw-block-volume)
+This functional test validates the raw block volume support for zfs-localpv. For detailed README for this test [click here](https://github.com/openebs/e2e-tests/tree/master/experiments/zfs-localpv/functional/zfspv-raw-block-volume).
 
 #### Test Results
 

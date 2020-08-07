@@ -10,7 +10,7 @@ This functional test validates the custom-topology support for zfs-localpv, wher
 - Then verify that volume is provisioned on labeled nodes only.
 - Secondly we label the nodes and then provision the volume when volumeBindingMode is WaitForFirstConsumer. In this case we need to restart the csi nodes so that csi nodes get aware of the labels.
 - Again verify that volume is provisioned on labeled nodes only.
-- For detailed README for this test [click here](https://github.com/openebs/e2e-tests/tree/master/experiments/zfs-localpv/functional/zfspv-custom-topology)
+- For detailed README for this test [click here](https://github.com/openebs/e2e-tests/tree/master/experiments/zfs-localpv/functional/zfspv-custom-topology).
 
 #### Test Results
 
