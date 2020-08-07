@@ -33,7 +33,7 @@ echo $test_name
 
 ## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
 cd e2e-tests
-cp experiments/functional/zfs-LocalPV/zv-property-runtime-modify/run_litmus_test.yml zv_property_runtime_modify.yml
+cp experiments/zfs-localpv/functional/zv-property-runtime-modify/run_litmus_test.yml zv_property_runtime_modify.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: zfs-zv-property-runtime-modify/g' \
