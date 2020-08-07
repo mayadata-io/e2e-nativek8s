@@ -173,7 +173,7 @@ stages:
 
 ##################################
 
-CLUSTER-CLEANUP:
+6D01-CLUSTER-CLEANUP:
   image: openebs/openshift-ci:latest
   stage: CLEANUP
   when: always
