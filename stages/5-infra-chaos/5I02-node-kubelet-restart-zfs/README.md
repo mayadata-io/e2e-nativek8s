@@ -15,6 +15,7 @@ This test restarts the kubelet services on the node on which application is usin
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/251873">251873</a>           |  Restart the kubelet services on application node and check the behaviour of zfs-localpv           | Fri Aug 14 20:43:40 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/251851">251851</a>           |  Restart the kubelet services on application node and check the behaviour of zfs-localpv           | Fri Aug 14 19:56:36 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/251579">251579</a>           |  Restart the kubelet services on application node and check the behaviour of zfs-localpv           | Fri Aug 14 12:00:18 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/251555">251555</a>           |  Restart the kubelet services on application node and check the behaviour of zfs-localpv           | Fri Aug 14 11:09:33 IST 2020  | Pass |
