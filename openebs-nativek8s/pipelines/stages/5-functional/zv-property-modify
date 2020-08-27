@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ## Define and initialize test-result specific variables.
+app_pod_kill_zfs_rc_val=1
 zv_property_modify_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
@@ -9,11 +10,7 @@ sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=
 
 }
 
-######################
-# ZV property modify #
-######################
-
-zv_property_modify() {
+app_pod_kill_zfs(){
 
 job_id=$(echo $1)
 pipeline_id=$(echo $2)
@@ -26,6 +23,55 @@ current_time=$(eval $time)
 ## Create the e2e-result-custom-resources for the jobs
 bash openebs-nativek8s/utils/e2e-cr jobname:zv-property-modify jobphase:Waiting
 bash openebs-nativek8s/utils/e2e-cr jobname:zv-property-modify jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+run_id="zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=application-pod-failure metadata=${run_id})
+echo $test_name
+
+cd e2e-tests
+# copy the content of deployer run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/chaos/app_pod_failure/run_litmus_test.yml appkill_zfs.yml
+
+sed -i -e 's/app=jenkins-app/name=percona/g' \
+-e 's/generateName: application-pod-failure-/generateName: application-pod-failure-zfs/g' \
+-e 's/name: application-pod-failure/name: application-pod-failure-zfs/g' \
+-e 's/name: app-failure/name: app-kill-zfs/g' \
+-e 's/value: app-jenkins-ns/value: percona-zfs-modify/g' appkill_zfs.yml
+
+## Replace the value of DATA_PERSISTENCE with application name in litmus experiment. 
+sed -i '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' appkill_zfs.yml
+
+## Insert the set of variables for busybox data consistency util into configmap spec.
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: appkillzfs
+' appkill_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' appkill_zfs.yml
+
+cat appkill_zfs.yml
+
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:application-pod-failure-zfs' job=appkill_zfs.yml
+cd ..
+# Get the cluster state Once the litmus jobs completed.
+bash openebs-nativek8s/utils/dump_cluster_state;
+bash openebs-nativek8s/utils/event_updater jobname:zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_pod_kill_zfs_rc_val=$(echo $?)
+if [ "$app_pod_kill_zfs_rc_val" != "0" ]; then
+zv_property_modify
+fi
+
+}
+
+######################
+# ZV property modify #
+######################
+
+zv_property_modify() {
 
 ## Generate the test name for running the litmusbook for percona deployment
 run_id="zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zvol-property-runtime-modify metadata=${run_id})
@@ -110,7 +156,8 @@ bash openebs-nativek8s/utils/event_updater jobname:zv-property-modify $test_name
 app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" -eq "0" ] &&
-   [ "$zv_property_modify_rc_val" -eq "0" ]; then
+   [ "$zv_property_modify_rc_val" -eq "0" ] &&
+   [ "$app_pod_kill_zfs_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
 bash openebs-nativek8s/utils/e2e-cr jobname:zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
@@ -124,7 +171,8 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  zv_property_modify $2 $3 $4
+  app_pod_kill_zfs $2 $3 $4
+  zv_property_modify
   app_deprovision
 else
   connect_cluster
