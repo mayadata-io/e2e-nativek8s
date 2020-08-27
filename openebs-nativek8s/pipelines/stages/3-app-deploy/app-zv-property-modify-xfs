@@ -57,6 +57,48 @@ bash openebs-nativek8s/utils/event_updater jobname:app-zv-property-modify-xfs $t
 app_deploy_rc_val=$(echo $?)
 if [ "$app_deploy_rc_val" != "0" ]; then
 exit 1;
+fi
+
+##########################################
+# Load some data in Percona application  #
+##########################################
+
+run_id="xfs-property-modify";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=data-persistence-check metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp experiments/functional/data-persistence/test.yml xfs_property_modify_data_load.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: data-persistence-litmus-/generateName: xfs-property-modify-data-load-/g' \
+-e 's/name: data-persistence/name: xfs-property-modify-data-load/g' \
+-e 's/name: litmus-data-persistence/name: xfs-property-modify-data-load/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-xfs-modify/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: '\''name=percona'\''/}' \
+-e '/name: STATUS/{n;s/.*/            value: LOAD/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' xfs_property_modify_data_load.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' xfs_property_modify_data_load.yml
+
+cat xfs_property_modify_data_load.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:xfs-property-modify-data-load' job=xfs_property_modify_data_load.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:app-zv-property-modify-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+rc_val=$(echo $?)
+current_time=$(eval $time)
+
+if [ "$rc_val" != "0" ]; then
+exit 1;
 
 else
 ## Update the e2e-result-custom-resources for the job
