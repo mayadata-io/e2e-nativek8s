@@ -21,10 +21,10 @@ sed -i -e 's/10.12.22.10/10.34.1.220/g' \
 -e 's/10.12.22.13/10.34.1.223/g' k8s/on-prem/openshift-installer/ip.csv
 
 #Replace the Vm names in csv file
-sed -i -e 's/auto1/Native-k8s-pipeline-master/g' \
--e 's/auto2/Native-K8s-pipeline-node1/g' \
--e 's/auto3/Native-K8s-pipeline-node2/g' \
--e 's/auto4/Native-K8s-pipeline-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
+sed -i -e 's/auto1/k8s-master/g' \
+-e 's/auto2/k8s-node1/g' \
+-e 's/auto3/k8s-node2/g' \
+-e 's/auto4/k8s-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
 
 #Replace the snapshot name and exp ip in vars
 sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "kubeadm"/g' \
