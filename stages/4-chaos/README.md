@@ -6,3 +6,6 @@ The goal for this gitlab stage is to induce chaos into zfs-localpv components, z
 
 | TCID  |                 Test case description                                        |
 |-------|------------------------------------------------------------------------------|
+| 4C01  | Kill the application pod container when fstype is zfs                        |
+| 4C02  | Kill the application pod container when fstype is xfs                        |
+| 4C03  | Kill the application pod container when fstype is ext4                       |
