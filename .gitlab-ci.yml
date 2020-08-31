@@ -160,19 +160,19 @@ stages:
   dependencies:
     - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
 
-4C01-APP-POD-FAILURE-ZFS:
+4C01-APP-POD-KILL-ZFS:
   extends: .chaos_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C01-app-pod-kill-zfs
     - ./openebs-nativek8s/pipelines/stages/4-chaos/4C01-app-pod-kill-zfs
 
-4C02-APP-POD-FAILURE-XFS:
+4C02-APP-POD-KILL-XFS:
   extends: .chaos_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C02-app-pod-kill-xfs
     - ./openebs-nativek8s/pipelines/stages/4-chaos/4C02-app-pod-kill-xfs
 
-4C03-APP-POD-FAILURE-EXT4:
+4C03-APP-POD-KILL-EXT4:
   extends: .chaos_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C03-app-pod-kill-ext4
