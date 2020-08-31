@@ -84,6 +84,12 @@ sed -i '/command:/i \
             value: '"$run_id"'\
 ' xfs_property_modify_data_load.yml
 
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: xfsdataload
+' xfs_property_modify_data_load.yml
+
 cat xfs_property_modify_data_load.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
