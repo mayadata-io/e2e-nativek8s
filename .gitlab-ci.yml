@@ -4,6 +4,7 @@ stages:
     - CLUSTER-SETUP
     - PROVISIONER
     - FUNCTIONAL
+    - CHAOS
     - INFRA-CHAOS
     - CLEANUP
 
@@ -147,6 +148,36 @@ stages:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
+
+##################################
+
+.chaos_template:
+  image: openebs/openshift-ci:latest
+  stage: CHAOS
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
+
+4C01-APP-POD-FAILURE-ZFS:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C01-app-pod-kill-zfs
+    - ./openebs-nativek8s/pipelines/stages/4-chaos/4C01-app-pod-kill-zfs
+
+4C02-APP-POD-FAILURE-XFS:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C02-app-pod-kill-xfs
+    - ./openebs-nativek8s/pipelines/stages/4-chaos/4C02-app-pod-kill-xfs
+
+4C03-APP-POD-FAILURE-EXT4:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C03-app-pod-kill-ext4
+    - ./openebs-nativek8s/pipelines/stages/4-chaos/4C03-app-pod-kill-ext4
+    
 
 ##################################
 
