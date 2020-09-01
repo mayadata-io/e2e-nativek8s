@@ -1,0 +1,238 @@
+#!/bin/bash
+
+### Taint the node to run infra chaos test scripts
+node_name=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
+
+## Define and initialize test-result specific variables.
+app_deploy_rc_val=1
+app_loadgen_rc_val=1
+node_failure_zfs_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/5-infra-chaos/5I03-node-failure-zfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"'
+
+}
+
+#######################################
+# Deploy percona application on ZFSPV #
+#######################################
+
+app_deploy() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+observer_node=$4
+source ~/.profile
+gittoken=$(echo "$github_token")
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:node-kubelet-restart-zfs
+bash openebs-nativek8s/utils/e2e-cr jobname:node-failure-zfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="node-failure-zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp apps/percona/deployers/run_litmus_test.yml percona_deploy_node_failure_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-node-failure-zfs/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-node-failure-zfs-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-zfs/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: node-zfs/g' percona_deploy_node_failure_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_deploy_node_failure_zfs.yml
+
+cat percona_deploy_node_failure_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-node-failure-zfs' job=percona_deploy_node_failure_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_rc_val=$(echo $?)
+if [ "$app_deploy_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+###################################
+# Loadgen on Percona application  #
+###################################
+
+app_loadgen() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="node-failure-zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-loadgen metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/workload/run_litmus_test.yml loadgen_node_failure_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: loadjob-node-failure-zfs/g' \
+-e 's/generateName: percona-loadgen-/generateName: loadgen-node-failure-zfs-/g' \
+-e 's/value: app-percona-ns/value: node-zfs/g' loadgen_node_failure_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' loadgen_node_failure_zfs.yml
+
+cat loadgen_node_failure_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='loadgen:loadjob-node-failure-zfs' job=loadgen_node_failure_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_loadgen_rc_val=$(echo $?)
+if [ "$app_loadgen_rc_val" != "0" ]; then
+app_deprovision
+fi
+
+}
+
+##################################
+#  Perform kubelet-restart test   #
+##################################
+
+node_failure_zfs() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=node-failure metadata=${run_id})
+echo $test_name
+
+## copy the content of run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp experiments/chaos/node_failure/run_litmus_test.yml run_node_failure_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/value: app-percona-ns/value: node-zfs/g' \
+-e 's/password:/password: cGFzc3dvcmQ=/g' \
+-e 's/generateName: node-failure-/generateName: zfs-node-failure-/g' \
+-e '/name: USERNAME/{n;s/.*/            value: k8s/}' \
+-e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' \
+-e 's/name: node-failure/name: node-failure-zfs/g' \
+-e 's/passwordNode:/passwordNode: VGVzdEAxMjM=/g' run_node_failure_zfs.yml
+
+sed -i -e "s|#nodeSelector|nodeSelector|g" \
+-e "s|#  kubernetes.io/hostname:|  kubernetes.io/hostname: ${observer_node}|g" run_node_failure_zfs.yml
+
+sed -i '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' run_node_failure_zfs.yml
+
+sed -i '/name: ESX_HOST_IP/{n;s/.*/            value: 10.44.1.1/}' run_node_failure_zfs.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: nodefailurezfs
+' run_node_failure_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' run_node_failure_zfs.yml
+
+cat run_node_failure_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:node-failure-zfs' job=run_node_failure_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+node_failure_zfs_rc_val=$(echo $?)
+if [ "$node_failure_zfs_rc_val" != "0" ]; then
+app_deprovision
+fi
+
+}
+
+##########################
+# Deprovision Application#
+##########################
+
+app_deprovision() {
+  
+## Generate test name to run litmusbook for deprovisioning the percona application
+run_id="deprovision-node-failure-zfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/deployers/run_litmus_test.yml percona_node_zfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-dep-node-failure-zfs/g' \
+-e 's/generateName: litmus-percona-/generateName: percona-dep-node-failure-zfs-/g' \
+-e 's/value: openebs-standard/value: zfs-sc-zfs/g' \
+-e 's/value: provision/value: deprovision/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: node-zfs/g' percona_node_zfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_node_zfs_deprovision.yml
+
+cat percona_node_zfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-dep-node-failure-zfs' job=percona_node_zfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_rc_val=$(echo $?)
+
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
+   [ "$node_failure_zfs_rc_val" -eq "0" ] &&
+   [ "$app_loadgen_rc_val" -eq "0" ] &&
+   [ "$app_deploy_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:node-failure-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 5I03 5-infra-chaos "Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv" Pass $pipeline_id "$current_time" $commit_id $gittoken
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:node-failure-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 5I03 5-infra-chaos "Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv" Fail $pipeline_id "$current_time" $commit_id $gittoken
+exit 1;
+fi
+
+}
+
+
+if [ "$1" == "run_job" ];then
+  app_deploy $2 $3 $4 $5
+  app_loadgen
+  node_failure_zfs
+  app_deprovision
+else
+  connect_cluster
+fi
