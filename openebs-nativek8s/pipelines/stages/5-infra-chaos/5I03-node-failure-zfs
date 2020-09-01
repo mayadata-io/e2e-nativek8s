@@ -133,6 +133,7 @@ sed -i -e 's/value: app-percona-ns/value: node-zfs/g' \
 -e '/name: USERNAME/{n;s/.*/            value: k8s/}' \
 -e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' \
 -e 's/name: node-failure/name: node-failure-zfs/g' \
+-e 's/name: node-password/name: node-password-zfs/g' \
 -e 's/passwordNode:/passwordNode: VGVzdEAxMjM=/g' run_node_failure_zfs.yml
 
 sed -i -e "s|#nodeSelector|nodeSelector|g" \
