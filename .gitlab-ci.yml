@@ -202,6 +202,12 @@ stages:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I02-node-kubelet-restart-zfs
     - ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I02-node-kubelet-restart-zfs
 
+5I03-NODE-FAILURE-ZFS:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I03-node-failure-zfs
+    - ./openebs-nativek8s/pipelines/stages/5-infra-chaos/5I03-node-failure-zfs
+    
 ##################################
 
 6D01-CLUSTER-CLEANUP:
