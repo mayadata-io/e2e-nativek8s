@@ -149,6 +149,12 @@ stages:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
 
+3F17-ZFSPV-SHARED-MOUNT-VOLUME-BTRFS:
+  extends: .func_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F17-zfspv-shared-mount-volume-btrfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F17-zfspv-shared-mount-volume-btrfs
+
 ##################################
 
 .chaos_template:
@@ -178,6 +184,11 @@ stages:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C03-app-pod-kill-ext4
     - ./openebs-nativek8s/pipelines/stages/4-chaos/4C03-app-pod-kill-ext4
     
+4C04-APP-POD-KILL-BTRFS:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/4-chaos/4C04-app-pod-kill-btrfs
+    - ./openebs-nativek8s/pipelines/stages/4-chaos/4C04-app-pod-kill-btrfs
 
 ##################################
 
