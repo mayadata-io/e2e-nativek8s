@@ -1,0 +1,351 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+zfspv_shared_mount_btrfs_rc_val=1
+zfspv_shared_mount_snapshot_btrfs_rc_val=1
+zfspv_shared_mount_clone_btrfs_rc_val=1
+zfspv_shared_mount_clone_btrfs_deprovision_rc_val=1
+zfspv_shared_mount_snapshot_btrfs_deprovision_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/3F17-zfspv-shared-mount-volume-btrfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+
+}
+
+#######################################################
+# Perfom zfspv shared mount test with btrfs file-system #
+#######################################################
+
+zfspv_shared_mount_btrfs() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+source ~/.profile
+gittoken=$(echo "$github_token")
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:zfspv-custom-topology
+bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-shared-mount-volume-btrfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for performing the test for zfspv shared mount
+run_id="btrfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-shared-mount metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_btrfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/name: shared-mount-volume/name: shared-mount-volume-btrfs/g' \
+-e 's/generateName: zfspv-shared-mount-/generateName: shared-mount-zfspv-btrfs-/g' \
+-e 's/name: zfspv-shared-mount/name: zfspv-shared-mount-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: shared-pvc-btrfs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-btrfs-shared/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: busybox/}' \
+-e '/name: ACTION/{n;s/.*/            value: provision/}' zfspv_shared_mount_btrfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_btrfs.yml
+
+sed -i '/parameters.yml: |/a \
+    blocksize: 4k\
+    blockcount: 1024\
+    testfile: shared_mount_file
+' zfspv_shared_mount_btrfs.yml
+
+cat zfspv_shared_mount_btrfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:shared-mount-volume-btrfs' job=zfspv_shared_mount_btrfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_btrfs_rc_val=$(echo $?)
+if [ "$zfspv_shared_mount_btrfs_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+###################################
+# Volume snapshot for shared zfspv#
+###################################
+
+zfspv_shared_mount_snapshot_btrfs() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="shared-btrfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_btrfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: snapshot-zfspv-shared-btrfs-/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
+-e 's/name: zfspv-snapshot/name: snapshot-shared-mount-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: shared-pvc-btrfs/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=previous-pod/}' zfspv_shared_mount_snapshot_btrfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_snapshot_btrfs.yml
+
+cat zfspv_shared_mount_snapshot_btrfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:snapshot-shared-mount-btrfs' job=zfspv_shared_mount_snapshot_btrfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_snapshot_btrfs_rc_val=$(echo $?)
+if [ "$zfspv_shared_mount_snapshot_btrfs_rc_val" != "0" ]; then
+zfspv_shared_mount_btrfs_deprovision
+fi
+
+}
+
+###########################################
+#  zfspv-clone for shared-volume snapshot #
+###########################################
+
+zfspv_shared_mount_clone_btrfs() { 
+  
+## Generate test name for running litmusbook for creating zfspv snapshot
+run_id="shared-btrfs";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_btrfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-shared-btrfs/g' \
+-e 's/name: zfspv-clone/name: clone-zfspv-shared-btrfs/g' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-btrfs-shared/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-shared-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 4Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: busybox/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: busybox-clone/}' zfspv_shared_mount_clone_btrfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_clone_btrfs.yml
+
+cat zfspv_shared_mount_clone_btrfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:clone-zfspv-shared-btrfs' job=zfspv_shared_mount_clone_btrfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_clone_btrfs_rc_val=$(echo $?)
+if [ "$zfspv_shared_mount_clone_btrfs_rc_val" != "0" ]; then
+zfspv_shared_mount_snapshot_btrfs_deprovision
+zfspv_shared_mount_btrfs_deprovision
+fi
+
+}
+
+###########################
+# Deprovision zfspv-clone #
+###########################
+
+zfspv_shared_mount_clone_btrfs_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv clone
+run_id="shared-btrfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-clone metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-clone/run_litmus_test.yml zfspv_shared_mount_clone_btrfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-clone-/generateName: zfspv-clone-shared-btrfs-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-clone/  name: zfspv-clone-shared-btrfs-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-btrfs-shared/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
+-e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-shared-pvc/}' \
+-e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 4Gi/}' \
+-e '/name: APP_NAME/{n;s/.*/            value: busybox/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: busybox-clone/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' zfspv_shared_mount_clone_btrfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_clone_btrfs_deprovision.yml
+
+cat zfspv_shared_mount_clone_btrfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfspv-clone-shared-btrfs-deprovision' job=zfspv_shared_mount_clone_btrfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_clone_btrfs_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_shared_mount_clone_btrfs_deprovision_rc_val" != "0" ]; then
+zfspv_shared_mount_snapshot_btrfs_deprovision
+zfspv_shared_mount_btrfs_deprovision
+fi
+
+}
+
+###########################
+# Deprovision zfspv-snapshot #
+###########################
+
+zfspv_shared_mount_snapshot_btrfs_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
+run_id="shared-btrfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-snapshot metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of provisioner run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-snapshot/run_litmus_test.yml zfspv_shared_mount_snapshot_btrfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-snapshot-/generateName: zfspv-snapshot-shared-btrfs-deprovision-/g' \
+-e '/labels:/{n;s/  name: zfspv-snapshot/  name: zfspv-snapshot-shared-btrfs-deprovision/g}' \
+-e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: zfs-snapshot-class/}' \
+-e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: shared-pvc-btrfs/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=previous-pod/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' zfspv_shared_mount_snapshot_btrfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_snapshot_btrfs_deprovision.yml
+
+cat zfspv_shared_mount_snapshot_btrfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:zfspv-snapshot-shared-btrfs-deprovision' job=zfspv_shared_mount_snapshot_btrfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_snapshot_btrfs_deprovision_rc_val=$(echo $?)
+if [ "$zfspv_shared_mount_snapshot_btrfs_deprovision_rc_val" != "0" ]; then
+zfspv_shared_mount_btrfs_deprovision
+fi
+
+}
+
+
+##################################
+# Deprovision zfspv-shared-mount #
+##################################
+
+zfspv_shared_mount_btrfs_deprovision() {
+
+## Generate test name to run litmusbook for deprovisioning the zfspv-snapshot
+run_id="btrfs-deprovision";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-shared-mount metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of run_litmus_test.yml into a different file to update the test specific parameters.
+cp experiments/zfs-localpv/functional/zfspv-shared-mount/run_litmus_test.yml zfspv_shared_mount_btrfs_deprovision.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/name: shared-mount-volume/name: shared-mount-volume-btrfs-deprovision/g' \
+-e 's/generateName: zfspv-shared-mount-/generateName: shared-mount-zfspv-btrfs-deprovision-/g' \
+-e 's/name: zfspv-shared-mount/name: zfspv-shared-mount-btrfs/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
+-e '/name: APP_PVC/{n;s/.*/            value: shared-pvc-btrfs/}' \
+-e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-btrfs-shared/}' \
+-e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/}' \
+-e '/name: ACTION/{n;s/.*/            value: deprovision/}' zfspv_shared_mount_btrfs_deprovision.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zfspv_shared_mount_btrfs_deprovision.yml
+
+cat zfspv_shared_mount_btrfs_deprovision.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='name:shared-mount-volume-btrfs-deprovision' job=zfspv_shared_mount_btrfs_deprovision.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-btrfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zfspv_shared_mount_btrfs_deprovision_rc_val=$(echo $?)
+
+if [ "$zfspv_shared_mount_btrfs_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_shared_mount_snapshot_btrfs_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_shared_mount_clone_btrfs_deprovision_rc_val" -eq "0" ] &&
+   [ "$zfspv_shared_mount_clone_btrfs_rc_val" -eq "0" ] &&
+   [ "$zfspv_shared_mount_snapshot_btrfs_rc_val" -eq "0" ] &&
+   [ "$zfspv_shared_mount_btrfs_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-shared-mount-volume-btrfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F17 3-functional "zfspv shared mount volume support when fstype is btrfs" Pass $pipeline_id "$current_time" $commit_id $gittoken
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:zfspv-shared-mount-volume-btrfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F17 3-functional "zfspv shared mount volume support when fstype is btrfs" Fail $pipeline_id "$current_time" $commit_id $gittoken
+exit 1;
+fi
+
+}
+
+
+if [ "$1" == "run_job" ];then
+  zfspv_shared_mount_btrfs $2 $3 $4 $5
+  zfspv_shared_mount_snapshot_btrfs
+  zfspv_shared_mount_clone_btrfs
+  zfspv_shared_mount_clone_btrfs_deprovision
+  zfspv_shared_mount_snapshot_btrfs_deprovision
+  zfspv_shared_mount_btrfs_deprovision
+
+else
+  connect_cluster
+fi
