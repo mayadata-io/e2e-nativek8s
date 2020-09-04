@@ -19,3 +19,7 @@ The goal of this gitlab stage is to test functional tests of zfs-localpv feature
 | 3F11  | Creation of volume snapshot and clone, when fstype is ext4                              |
 | 3F12  | Creation of volume snapshot and clone, when fstype is xfs                               |
 | 3F13  | Creation of volume snapshot and clone, when fstype is btrfs                             |
+| 3F14  | Shared mount support for zfspv, when fstype is zfs                                      |
+| 3F15  | Shared mount support for zfspv, when fstype is ext4                                     |
+| 3F16  | Shared mount support for zfspv, when fstype is xfs                                      |
+| 3F17  | Shared mount support for zfspv, when fstype is btrfs                                    |
