@@ -15,6 +15,7 @@ This test deploys the zfs-localpv components in the `kube-system` namespace whic
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/260140">260140</a>           |  Provision the zfs-localpv driver           | Thu Sep 10 21:10:32 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/260049">260049</a>           |  Provision the zfs-localpv driver           | Thu Sep 10 19:55:34 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/258055">258055</a>           |  Provision the zfs-localpv driver           | Tue Sep  8 11:33:12 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/257829">257829</a>           |  Provision the zfs-localpv driver           | Mon Sep  7 18:03:21 IST 2020  | Pass |
