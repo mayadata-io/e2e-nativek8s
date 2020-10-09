@@ -1,0 +1,248 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_deploy_rc_val=1
+app_loadgen_rc_val=1
+xfs_backup_diff_ns_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/3-functional/3F20-xfs-backup-restore-diff-ns run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$VELERO_PLUGIN_NAME'"' '"'$VELERO_VERSION'"'
+
+}
+
+#######################################
+# Deploy percona application on ZFSPV #
+#######################################
+
+app_deploy() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+velero_plugin=$(echo $4)
+velero_version=$(echo $5)
+source ~/.profile
+gittoken=$(echo "$github_token")
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash openebs-nativek8s/utils/pooling jobname:ext4-backup-restore-diff-ns
+bash openebs-nativek8s/utils/e2e-cr jobname:xfs-backup-restore-diff-ns jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="bkp-restore-diff-ns";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp apps/percona/deployers/run_litmus_test.yml percona_xfs_bkp_diff_ns.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-xfs-bkp-diff-ns/g' \
+-e 's/generateName: litmus-percona-/generateName: litmus-percona-xfs-bkp-restore-diff-ns/g' \
+-e 's/value: openebs-standard/value: zfs-sc-xfs/g' \
+-e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
+-e 's/value: app-percona-ns/value: xfs-bkp-diff-ns/g' percona_xfs_bkp_diff_ns.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' percona_xfs_bkp_diff_ns.yml
+
+cat percona_xfs_bkp_diff_ns.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-xfs-bkp-diff-ns' job=percona_xfs_bkp_diff_ns.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-ns $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_rc_val=$(echo $?)
+if [ "$app_deploy_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+################
+#  App_Loaden  #
+################
+
+app_loadgen() {
+
+## Generate test name for running litmusbook for generate load on application
+run_id="bkp-restore-diff-ns";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-loadgen metadata=${run_id})
+echo $test_name
+cd e2e-tests
+
+# copy the content of workload run_litmus_test.yml into a different file to update the test specific parameters.
+cp apps/percona/workload/run_litmus_test.yml loadgen_bkp_restore_diff_ns.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: loadgen-bkp-restore-diff-ns/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-bkp-restore-diff-ns-/g' \
+-e 's/value: app-percona-ns/value: xfs-bkp-diff-ns/g' loadgen_bkp_restore_diff_ns.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' loadgen_bkp_restore_diff_ns.yml
+
+cat loadgen_bkp_restore_diff_ns.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='loadgen:loadgen-bkp-restore-diff-ns' job=loadgen_bkp_restore_diff_ns.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-ns $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_loadgen_rc_val=$(echo $?)
+if [ "$app_loadgen_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+#########################
+#  zfspv-velero-backup  #
+#########################
+
+xfs_backup_diff_ns() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="xfs-bkp-diff-ns";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-velero-backup-restore metadata=${run_id})
+echo $test_name
+
+## copy the content of run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp experiments/zfs-localpv/functional/backup_and_restore/run_litmus_test.yml xfs_backup_diff_ns.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: xfs-backup-diff-ns-/g' \
+-e 's/app: velero-backup-restore/app: xfs-bkp-diff-ns/g' \
+-e 's/name: configmap-zfspv-backup-store/name: configmap-xfs-backup-restore-diff-ns/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: xfs-bkp-diff-ns/g}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/g}' \
+-e '/name: ACTION/{n;s/.*/            value: backup/g}' \
+-e '/name: VELERO_BACKUP_NAME/{n;s/.*/            value: xfs-diff-ns-backup/g}' \
+-e "/name: VELERO_PLUGIN_NAME/{n;s/.*/            value: ${velero_plugin}/g}" \
+-e "/name: VELERO_VERSION/{n;s/.*/            value: ${velero_version}/g}" \
+-e '/name: STORAGE_BUCKET/{n;s/.*/            value: minio/g}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' xfs_backup_diff_ns.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' xfs_backup_diff_ns.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: xfs_bkp_diff_ns
+' xfs_backup_diff_ns.yml
+
+cat xfs_backup_diff_ns.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:xfs-bkp-diff-ns' job=xfs_backup_diff_ns.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-ns $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+xfs_backup_diff_ns_rc_val=$(echo $?)
+if [ "$xfs_backup_diff_ns_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+############################
+#   zfspv-velero-restore   #
+############################
+
+xfs_restore_diff_ns() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="xfs-restore-diff-ns";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-velero-backup-restore metadata=${run_id})
+echo $test_name
+
+## copy the content of run_litmus_test.yml into a temporary file to update the test specific parameters.
+cd e2e-tests
+cp experiments/zfs-localpv/functional/backup_and_restore/run_litmus_test.yml xfs_restore_diff_ns.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: xfs-restore-diff-ns-/g' \
+-e 's/app: velero-backup-restore/app: xfs-restore-diff-ns/g' \
+-e 's/name: configmap-zfspv-backup-store/name: configmap-xfs-backup-restore-diff-ns/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: xfs-bkp-diff-ns/g}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/g}' \
+-e '/name: ACTION/{n;s/.*/            value: restore/g}' \
+-e '/name: VELERO_BACKUP_NAME/{n;s/.*/            value: xfs-diff-ns-backup/g}' \
+-e "/name: VELERO_PLUGIN_NAME/{n;s/.*/            value: ${velero_plugin}/g}" \
+-e "/name: VELERO_VERSION/{n;s/.*/            value: ${velero_version}/g}" \
+-e '/name: STORAGE_BUCKET/{n;s/.*/            value: minio/g}' \
+-e '/name: RESTORE_IN_DIFF_NAMESPACE/{n;s/.*/            value: "true"/g}' \
+-e '/name: RESTORE_NAMESPACE/{n;s/.*/            value: xfs-restore-diff-ns/g}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' xfs_restore_diff_ns.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' xfs_restore_diff_ns.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: xfs_bkp_diff_ns
+' xfs_restore_diff_ns.yml
+
+cat xfs_backup_diff_ns.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:xfs-restore-diff-ns' job=xfs_restore_diff_ns.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../openebs-nativek8s/utils/dump_cluster_state;
+cd ..
+## Update the e2e event for the job.
+bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-ns $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+xfs_restore_diff_ns_rc_val=$(echo $?)
+
+if [ "$xfs_restore_diff_ns_rc_val" -eq "0" ] &&
+   [ "$xfs_backup_diff_ns_rc_val" -eq "0" ] &&
+   [ "$app_loadgen_rc_val" -eq "0" ] &&
+   [ "$app_deploy_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:xfs-backup-restore-diff-ns jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F20 3-functional "create backup of zfs volume when fstype is xfs and restore in different namespace" Pass $pipeline_id "$current_time" $commit_id $gittoken
+
+else
+## Update the e2e-result-custom-resources for the job
+bash openebs-nativek8s/utils/e2e-cr jobname:xfs-backup-restore-diff-ns jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F20 3-functional "create backup of zfs volume when fstype is xfs and restore in different namespace" Fail $pipeline_id "$current_time" $commit_id $gittoken
+exit 1;
+fi
+
+}
+
+
+if [ "$1" == "run_job" ];then
+  app_deploy $2 $3 $4 $5 $6
+  app_loadgen
+  xfs_backup_diff_ns
+  xfs_restore_diff_ns
+else
+  connect_cluster
+fi

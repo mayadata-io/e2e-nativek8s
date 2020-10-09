@@ -3,7 +3,8 @@
 stages:
     - CLUSTER-SETUP
     - PROVISIONER
-    - FUNCTIONAL
+    - FUNCTIONAL-1
+    - FUNCTIONAL-2
     - CHAOS
     - INFRA-CHAOS
     - CLEANUP
@@ -44,9 +45,9 @@ stages:
     
 ##################################
 
-.func_test_template:
+.func1_test_template:
   image: openebs/openshift-ci:latest
-  stage: FUNCTIONAL
+  stage: FUNCTIONAL-1
   tags:
     - k8s-native
   when: always
@@ -54,106 +55,153 @@ stages:
     - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
 
 3F01-ZFSPV-CUSTOM-TOPOLOGY-VERIFY:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F01-zfspv-custom-topology-verify
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F01-zfspv-custom-topology-verify
 
 3F02-ZFSPV-RAW-BLOCK-VOLUME:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F02-zfspv-raw-block-volume
     
 3F03-ZFS-VOLUME-RESIZE-ZFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F03-zfs-volume-resize-zfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F03-zfs-volume-resize-zfs
 
 3F04-ZFS-VOLUME-RESIZE-EXT4:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F04-zfs-volume-resize-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F04-zfs-volume-resize-ext4
 
 3F05-ZFS-VOLUME-RESIZE-XFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F05-zfs-volume-resize-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F05-zfs-volume-resize-xfs
 
 3F06-ZFSPV-PROPERTY-MODIFY-ZFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F06-zfspv-property-modify-zfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F06-zfspv-property-modify-zfs
       
 3F07-ZFSPV-PROPERTY-MODIFY-EXT4:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F07-zfspv-property-modify-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F07-zfspv-property-modify-ext4
 
 3F08-ZFSPV-PROPERTY-MODIFY-XFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F08-zfspv-property-modify-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F08-zfspv-property-modify-xfs
 
 3F09-ZV-PROPERTY-MODIFY-BTRFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F09-zfspv-property-modify-btrfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F09-zfspv-property-modify-btrfs
 
 3F10-ZFSPV-SNAPSHOT-CLONE-ZFS-CREATE:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F10-zfspv-snapshot-clone-zfs-create
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F10-zfspv-snapshot-clone-zfs-create
 
 3F11-ZFSPV-SNAPSHOT-CLONE-EXT4-CREATE:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F11-zfspv-snapshot-clone-ext4-create
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F11-zfspv-snapshot-clone-ext4-create
 
 3F12-ZFSPV-SNAPSHOT-CLONE-XFS-CREATE:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F12-zfspv-snapshot-clone-xfs-create
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F12-zfspv-snapshot-clone-xfs-create
 
 3F13-ZFSPV-SNAPSHOT-CLONE-BTRFS-CREATE:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F13-zfspv-snapshot-clone-btrfs-create
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F13-zfspv-snapshot-clone-btrfs-create
 
 3F14-ZFSPV-SHARED-MOUNT-VOLUME-ZFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F14-zfspv-shared-mount-volume-zfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F14-zfspv-shared-mount-volume-zfs
 
 3F15-ZFSPV-SHARED-MOUNT-VOLUME-EXT4:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F15-zfspv-shared-mount-volume-ext4
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F15-zfspv-shared-mount-volume-ext4
 
 3F16-ZFSPV-SHARED-MOUNT-VOLUME-XFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F16-zfspv-shared-mount-volume-xfs
 
 3F17-ZFSPV-SHARED-MOUNT-VOLUME-BTRFS:
-  extends: .func_test_template
+  extends: .func1_test_template
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F17-zfspv-shared-mount-volume-btrfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F17-zfspv-shared-mount-volume-btrfs
+
+##################################
+
+.func2_test_template:
+  image: openebs/openshift-ci:latest
+  stage: FUNCTIONAL-2
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
+
+3F18-ZFS-BACKUP-RESTORE-DIFF-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F18-zfs-backup-restore-diff-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F18-zfs-backup-restore-diff-ns
+
+3F19-EXT4-BACKUP-RESTORE-DIFF-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F19-ext4-backup-restore-diff-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F19-ext4-backup-restore-diff-ns
+
+3F20-XFS-BACKUP-RESTORE-DIFF-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F20-xfs-backup-restore-diff-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F20-xfs-backup-restore-diff-ns
+
+3F21-ZFS-BACKUP-RESTORE-SAME-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F21-zfs-backup-restore-same-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F21-zfs-backup-restore-same-ns
+
+3F22-EXT4-BACKUP-RESTORE-SAME-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F22-ext4-backup-restore-same-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F22-ext4-backup-restore-same-ns
+
+3F23-XFS-BACKUP-RESTORE-SAME-NS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F23-xfs-backup-restore-same-ns
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F23-xfs-backup-restore-same-ns
 
 ##################################
 
