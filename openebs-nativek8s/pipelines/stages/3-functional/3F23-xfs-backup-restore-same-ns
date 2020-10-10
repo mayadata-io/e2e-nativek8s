@@ -239,7 +239,7 @@ fi
 
 
 if [ "$1" == "run_job" ];then
-  app_deploy $2 $3 $4 $5
+  app_deploy $2 $3 $4 $5 $6
   app_loadgen
   xfs_backup_same_ns
   xfs_restore_same_ns
