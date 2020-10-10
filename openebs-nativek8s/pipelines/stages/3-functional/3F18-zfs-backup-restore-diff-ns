@@ -192,7 +192,7 @@ sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: zfs-restor
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: zfs-bkp-diff-ns/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-mysql-claim/g}' \
--e '/name: ACTION/{n;s/.*/            value: backup/g}' \
+-e '/name: ACTION/{n;s/.*/            value: restore/g}' \
 -e '/name: VELERO_BACKUP_NAME/{n;s/.*/            value: zfs-diff-ns-backup/g}' \
 -e "/name: VELERO_PLUGIN_NAME/{n;s/.*/            value: ${velero_plugin}/g}" \
 -e "/name: VELERO_VERSION/{n;s/.*/            value: ${velero_version}/g}" \
