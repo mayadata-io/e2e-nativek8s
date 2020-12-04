@@ -18,6 +18,7 @@ This test takes the zfs volume snapshot and later use that snapshot to create cl
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300574">300574</a>           |  create volume snapshot and clone when fstype is btrfs           | Fri Dec  4 13:43:45 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300540">300540</a>           |  create volume snapshot and clone when fstype is btrfs           | Fri Dec  4 11:23:54 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/299807">299807</a>           |  create volume snapshot and clone when fstype is btrfs           | Wed Dec  2 21:35:47 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/299773">299773</a>           |  create volume snapshot and clone when fstype is btrfs           | Wed Dec  2 17:02:17 IST 2020  | Pass |
