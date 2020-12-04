@@ -14,6 +14,7 @@ This test deploys the zfs-controller in high availability (more than one replica
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300708">300708</a>           |  Deploy zfs-localpv controller statefulset in high availability           | Fri Dec  4 16:43:35 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300561">300561</a>           |  Deploy zfs-localpv controller statefulset in high availability           | Fri Dec  4 13:40:28 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300527">300527</a>           |  Deploy zfs-localpv controller statefulset in high availability           | Fri Dec  4 11:20:28 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/299794">299794</a>           |  Deploy zfs-localpv controller statefulset in high availability           | Wed Dec  2 21:32:40 IST 2020  | Pass |
