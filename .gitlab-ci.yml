@@ -220,7 +220,25 @@ stages:
   script:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F26-zfspv-clone-from-pvc-xfs
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F26-zfspv-clone-from-pvc-xfs
-            
+       
+3F27-ZFS-BACKUP-RESTORE-DIFF-NODE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F27-zfs-backup-restore-diff-node
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F27-zfs-backup-restore-diff-node
+
+3F28-EXT4-BACKUP-RESTORE-DIFF-NODE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F28-ext4-backup-restore-diff-node
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F28-ext4-backup-restore-diff-node
+
+3F29-XFS-BACKUP-RESTORE-DIFF-NODE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F29-xfs-backup-restore-diff-node
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F29-xfs-backup-restore-diff-node
+
 ##################################
 
 .chaos_template:
