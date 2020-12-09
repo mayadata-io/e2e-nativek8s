@@ -203,6 +203,24 @@ stages:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F23-xfs-backup-restore-same-ns
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F23-xfs-backup-restore-same-ns
 
+3F24-ZFSPV-CLONE-FROM-PVC-ZFS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F24-zfspv-clone-from-pvc-zfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F24-zfspv-clone-from-pvc-zfs
+
+3F25-ZFSPV-CLONE-FROM-PVC-EXT4:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F25-zfspv-clone-from-pvc-ext4
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F25-zfspv-clone-from-pvc-ext4
+
+3F26-ZFSPV-CLONE-FROM-PVC-XFS:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F26-zfspv-clone-from-pvc-xfs
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F26-zfspv-clone-from-pvc-xfs
+            
 ##################################
 
 .chaos_template:
