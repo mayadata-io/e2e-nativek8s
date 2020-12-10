@@ -180,8 +180,8 @@ cd e2e-tests
 cp apps/percona/deployers/run_litmus_test.yml percona_dep_clone_from_pvc_xfs.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e 's/app: percona-deployment/app: percona-clone-from-pvc-xfs/g' \
--e 's/generateName: litmus-percona-/generateName: litmus-percona-clone-from-pvc-xfs-/g' \
+sed -i -e 's/app: percona-deployment/app: percona-dep-clone-from-pvc-xfs/g' \
+-e 's/generateName: litmus-percona-/generateName: litmus-percona-dep-clone-from-pvc-xfs-/g' \
 -e 's/value: openebs-standard/value: zfs-sc-xfs/g' \
 -e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
 -e 's/value: provision/value: deprovision/g' \
@@ -195,7 +195,7 @@ sed -i '/command:/i \
 cat percona_dep_clone_from_pvc_xfs.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-clone-from-pvc-xfs' job=percona_dep_clone_from_pvc_xfs.yml
+bash ../openebs-nativek8s/utils/litmus_job_runner label='app:percona-dep-clone-from-pvc-xfs' job=percona_dep_clone_from_pvc_xfs.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../openebs-nativek8s/utils/dump_cluster_state;
 cd ..
