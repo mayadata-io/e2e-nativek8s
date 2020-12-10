@@ -130,7 +130,8 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: pvc-clone-ext4/g}' \
 -e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc-ext4/g}' \
 -e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/g}' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/g}' \
--e '/name: APP_LABEL/{n;s/.*/            value: ext4-pvc-clone/g}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: name=percona/g}' \
+-e '/name: CLONE_APP_LABEL/{n;s/.*/            value: ext4-pvc-clone/g}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' \
 -e 's/generateName: zfspv-clone-from-pvc/generateName: clone-from-pvc-ext4-/g' \
 -e 's/name: zfspv-clone-from-pvc/name: clone-from-pvc-ext4/g' clone_from_pvc_ext4.yml
