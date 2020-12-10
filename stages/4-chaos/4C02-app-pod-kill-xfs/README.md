@@ -15,6 +15,7 @@ This test kills the container of application pod consuming zfs-localpv backed by
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/303063">303063</a>           |  Kill the application pod container when fstype is xfs           | Thu Dec 10 15:54:11 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300767">300767</a>           |  Kill the application pod container when fstype is xfs           | Fri Dec  4 19:01:32 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300733">300733</a>           |  Kill the application pod container when fstype is xfs           | Fri Dec  4 17:37:09 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300586">300586</a>           |  Kill the application pod container when fstype is xfs           | Fri Dec  4 14:31:59 IST 2020  | Pass |
