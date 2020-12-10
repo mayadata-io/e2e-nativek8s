@@ -16,6 +16,7 @@ This functional test validates the custom-topology support for zfs-localpv, wher
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/303033">303033</a>           |  verify the zfspv-custom-topology support           | Thu Dec 10 14:50:57 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/302993">302993</a>           |  verify the zfspv-custom-topology support           | Thu Dec 10 12:36:32 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/302414">302414</a>           |  verify the zfspv-custom-topology support           | Wed Dec  9 12:36:48 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/300968">300968</a>           |  verify the zfspv-custom-topology support           | Sat Dec  5 10:58:11 IST 2020  | Pass |
