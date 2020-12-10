@@ -124,8 +124,8 @@ cp experiments/zfs-localpv/functional/zfspv-clone-directly-from-pvc/run_litmus_t
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: pvc-clone-ext4/g}' \
--e '/name: PARENT_PVC_NAME{n;s/.*/            value: percona-mysql-claim/g}' \
 -e '/name: OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/g}' \
+-e '/name: PARENT_PVC_NAME/{n;s/.*/            value: percona-mysql-claim/g}' \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc-ext4/g}' \
 -e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc-ext4/g}' \
 -e '/name: CLONE_PVC_SIZE/{n;s/.*/            value: 5Gi/g}' \
