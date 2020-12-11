@@ -239,6 +239,24 @@ stages:
     - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F29-xfs-backup-restore-diff-node
     - ./openebs-nativek8s/pipelines/stages/3-functional/3F29-xfs-backup-restore-diff-node
 
+3F30-ZFS-INCREMENTAL-BACKUP-RESTORE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F30-xfs-incremental-backup-restore
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F30-xfs-incremental-backup-restore
+
+3F31-EXT4-INCREMENTAL-BACKUP-RESTORE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F31-ext4-incremental-backup-restore
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F31-ext4-incremental-backup-restore
+
+3F32-XFS-INCREMENTAL-BACKUP-RESTORE:
+  extends: .func2_test_template
+  script:
+    - chmod 755 ./openebs-nativek8s/pipelines/stages/3-functional/3F32-xfs-incremental-backup-restore
+    - ./openebs-nativek8s/pipelines/stages/3-functional/3F32-xfs-incremental-backup-restore
+
 ##################################
 
 .chaos_template:
