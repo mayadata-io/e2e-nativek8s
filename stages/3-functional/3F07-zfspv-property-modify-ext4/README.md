@@ -14,6 +14,7 @@ This functional test validates the successful modification of zfspv properties a
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/305563">305563</a>           |  zfspv property runtime modification when fstype is ext4           | Sat Dec 12 13:52:47 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/305336">305336</a>           |  zfspv property runtime modification when fstype is ext4           | Sat Dec 12 10:13:42 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/304621">304621</a>           |  zfspv property runtime modification when fstype is ext4           | Fri Dec 11 23:17:35 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/303597">303597</a>           |  zfspv property runtime modification when fstype is ext4           | Fri Dec 11 11:07:06 IST 2020  | Pass |
