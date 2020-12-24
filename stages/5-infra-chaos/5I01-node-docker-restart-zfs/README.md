@@ -15,6 +15,7 @@ This test restarts the docker services on the node on which application is using
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/313258">313258</a>           |  Restart the docker services on application node and check the behaviour of zfs-localpv           | Thu Dec 24 21:37:50 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/312642">312642</a>           |  Restart the docker services on application node and check the behaviour of zfs-localpv           | Tue Dec 22 13:29:20 IST 2020  | Fail |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/312328">312328</a>           |  Restart the docker services on application node and check the behaviour of zfs-localpv           | Mon Dec 21 13:27:21 IST 2020  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/309769">309769</a>           |  Restart the docker services on application node and check the behaviour of zfs-localpv           | Tue Dec 15 17:38:10 IST 2020  | Pass |
