@@ -23,8 +23,8 @@ while [ -z "$job_name" ]; do
     fi
   job_name=$(eval ${jobNameCmd});
 done
-chmod 755 ../Openshift-EE/utils/error_handler
-bash ../Openshift-EE/utils/error_handler ${retcode} msg="Unable to run litmusbook, exiting" action="exit"
+chmod 755 ../openebs-nativek8s/utils/error_handler
+bash ../openebs-nativek8s/utils/error_handler ${retcode} msg="Unable to run litmusbook, exiting" action="exit"
     
 ## Obtain the litmus pod name 
 
@@ -39,7 +39,7 @@ while [ -z "$litmus_pod" ]; do
   pod_name=$(eval ${litmusPodCmd});
 done
 
-bash ../Openshift-EE/utils/error_handler ${retcode} msg="Unable to find litmus test runner pod, exiting" action="exit"
+bash ../openebs-nativek8s/utils/error_handler ${retcode} msg="Unable to find litmus test runner pod, exiting" action="exit"
 
 ## Wait till the ansibletest container terminates && also confirm job completion status. This is done to ensure
 ## that execution of auxiliary containers such as loggers is completed. Getting the ansibletest ccontainer to completed state 
