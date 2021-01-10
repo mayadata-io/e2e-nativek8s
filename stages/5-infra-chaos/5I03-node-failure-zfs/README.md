@@ -15,6 +15,7 @@ This test fails the node on which zfs-localpv is provisioned. For this we first 
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/320134">320134</a>           |  Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv           | Sun Jan 10 21:47:48 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/318443">318443</a>           |  Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv           | Sat Jan  9 21:25:38 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/316937">316937</a>           |  Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv           | Thu Jan  7 21:47:13 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/316667">316667</a>           |  Power off and on the worker node machine where volume is provisioned and check the behaviour of zfs-localpv           | Thu Jan  7 15:21:24 IST 2021  | Pass |
