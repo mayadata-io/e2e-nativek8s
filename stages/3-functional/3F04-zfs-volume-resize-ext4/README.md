@@ -15,6 +15,7 @@ This functional test verifies the csi volume resize feature when application whi
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/325221">325221</a>           |  zv property verify and zfs volume resize when fstype is ext4           | Thu Jan 14 23:43:36 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/324928">324928</a>           |  zv property verify and zfs volume resize when fstype is ext4           | Thu Jan 14 19:43:42 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/324453">324453</a>           |  zv property verify and zfs volume resize when fstype is ext4           | Thu Jan 14 10:11:47 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/323592">323592</a>           |  zv property verify and zfs volume resize when fstype is ext4           | Wed Jan 13 20:17:53 IST 2021  | Pass |
