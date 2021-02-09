@@ -19,6 +19,7 @@ This functional test validates the successful provisioning of shared mount volum
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/331005">331005</a>           |  zfspv shared mount volume support when fstype is zfs           | Tue Feb  9 17:30:34 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/330318">330318</a>           |  zfspv shared mount volume support when fstype is zfs           | Tue Feb  9 14:00:27 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/329792">329792</a>           |  zfspv shared mount volume support when fstype is zfs           | Tue Feb  9 09:44:02 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/329558">329558</a>           |  zfspv shared mount volume support when fstype is zfs           | Mon Feb  8 12:38:56 IST 2021  | Pass |
