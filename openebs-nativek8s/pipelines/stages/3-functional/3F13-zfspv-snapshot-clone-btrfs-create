@@ -106,7 +106,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-snapshot-clone-btrfs-cr
 
 app_loadgen_btrfs_rc_val=$(echo $?)
 if [ "$app_loadgen_btrfs_rc_val" != "0" ]; then
-app_deprovision_btrfs
+exit 1;
 fi
 
 }
@@ -160,7 +160,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-snapshot-clone-btrfs-cr
 
 zfspv_snapshot_btrfs_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_btrfs_rc_val" != "0" ]; then
-app_deprovision_btrfs
+exit 1;
 fi
 
 }
@@ -210,8 +210,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-snapshot-clone-btrfs-cr
 
 zfspv_clone_btrfs_rc_val=$(echo $?)
 if [ "$zfspv_clone_btrfs_rc_val" != "0" ]; then
-zfspv_snapshot_deprovision_btrfs
-app_deprovision_btrfs
+exit 1;
 fi
 
 }
@@ -262,8 +261,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-snapshot-clone-btrfs-cr
 
 zfspv_clone_btrfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_clone_btrfs_deprovision_rc_val" != "0" ]; then
-zfspv_snapshot_deprovision_btrfs
-app_deprovision_btrfs
+exit 1;
 fi
 
 }
@@ -312,7 +310,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-snapshot-clone-btrfs-cr
 
 zfspv_snapshot_btrfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_btrfs_deprovision_rc_val" != "0" ]; then
-app_deprovision_btrfs
+exit 1;
 fi
 
 }

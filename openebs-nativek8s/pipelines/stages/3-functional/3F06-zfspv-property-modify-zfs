@@ -110,7 +110,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-property-modify-zfs $te
 
 zv_property_modify_rc_val=$(echo $?)
 if [ "$zv_property_modify_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

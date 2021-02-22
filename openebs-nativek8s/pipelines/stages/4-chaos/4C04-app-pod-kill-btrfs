@@ -103,7 +103,7 @@ bash openebs-nativek8s/utils/event_updater jobname:app-pod-kill-btrfs $test_name
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
@@ -152,7 +152,7 @@ bash openebs-nativek8s/utils/event_updater jobname:app-pod-kill-btrfs $test_name
 
 app_pod_kill_btrfs_rc_val=$(echo $?)
 if [ "$app_pod_kill_btrfs_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

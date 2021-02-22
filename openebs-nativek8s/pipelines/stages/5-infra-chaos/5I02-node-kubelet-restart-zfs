@@ -107,7 +107,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-kubelet-restart-zfs $tes
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
@@ -164,7 +164,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-kubelet-restart-zfs $tes
 
 zfs_kubelet_restart_rc_val=$(echo $?)
 if [ "$zfs_kubelet_restart_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

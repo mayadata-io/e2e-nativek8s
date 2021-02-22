@@ -111,7 +111,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-docker-restart-zfs $test
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
@@ -168,7 +168,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-docker-restart-zfs $test
 
 zfs_docker_restart_rc_val=$(echo $?)
 if [ "$zfs_docker_restart_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
