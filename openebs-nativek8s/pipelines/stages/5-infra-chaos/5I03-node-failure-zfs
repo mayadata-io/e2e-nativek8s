@@ -107,7 +107,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name j
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
@@ -166,7 +166,7 @@ bash openebs-nativek8s/utils/event_updater jobname:node-failure-zfs $test_name j
 
 node_failure_zfs_rc_val=$(echo $?)
 if [ "$node_failure_zfs_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

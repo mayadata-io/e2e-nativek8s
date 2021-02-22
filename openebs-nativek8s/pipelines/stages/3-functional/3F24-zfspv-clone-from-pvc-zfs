@@ -103,7 +103,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $tes
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }
@@ -160,7 +160,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $tes
 
 clone_from_pvc_zfs_rc_val=$(echo $?)
 if [ "$clone_from_pvc_zfs_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

@@ -105,8 +105,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-volume-resize-zfs $test_n
 
 zv_properties_verify_rc_val=$(echo $?)
 if [ "$zv_properties_verify_rc_val" != "0" ]; then
-csi_vol_resize
-app_deprovision
+exit 1;
 fi
 
 }
@@ -151,7 +150,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-volume-resize-zfs $test_n
 
 csi_vol_resize_rc_val=$(echo $?)
 if [ "$csi_vol_resize_rc_val" != "0" ]; then
-app_deprovision
+exit 1;
 fi
 
 }

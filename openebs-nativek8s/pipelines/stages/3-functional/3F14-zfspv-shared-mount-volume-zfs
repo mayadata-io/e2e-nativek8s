@@ -121,7 +121,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-zfs
 
 zfspv_shared_mount_snapshot_zfs_rc_val=$(echo $?)
 if [ "$zfspv_shared_mount_snapshot_zfs_rc_val" != "0" ]; then
-zfspv_shared_mount_zfs_deprovision
+exit 1;
 fi
 
 }
@@ -170,8 +170,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-zfs
 
 zfspv_shared_mount_clone_zfs_rc_val=$(echo $?)
 if [ "$zfspv_shared_mount_clone_zfs_rc_val" != "0" ]; then
-zfspv_shared_mount_snapshot_zfs_deprovision
-zfspv_shared_mount_zfs_deprovision
+exit 1;
 fi
 
 }
@@ -221,8 +220,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-zfs
 
 zfspv_shared_mount_clone_zfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_shared_mount_clone_zfs_deprovision_rc_val" != "0" ]; then
-zfspv_shared_mount_snapshot_zfs_deprovision
-zfspv_shared_mount_zfs_deprovision
+exit 1;
 fi
 
 }
@@ -270,7 +268,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfspv-shared-mount-volume-zfs
 
 zfspv_shared_mount_snapshot_zfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_shared_mount_snapshot_zfs_deprovision_rc_val" != "0" ]; then
-zfspv_shared_mount_zfs_deprovision
+exit 1;
 fi
 
 }
