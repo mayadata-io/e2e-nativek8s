@@ -264,7 +264,7 @@ cd ..
 bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-same-ns $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
-if [ "$app_deprovision_rc_val" != "0" ] &&
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
    [ "$xfs_restore_same_ns_rc_val" -eq "0" ] &&
    [ "$xfs_backup_same_ns_rc_val" -eq "0" ] &&
    [ "$app_loadgen_rc_val" -eq "0" ] &&
