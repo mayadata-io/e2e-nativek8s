@@ -29,7 +29,7 @@ time="date"
 current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
-bash openebs-nativek8s/utils/pooling jobname:zfs-backup-restore-diff-ns
+bash openebs-nativek8s/utils/pooling jobname:zfs-backup-restore-diff-node
 bash openebs-nativek8s/utils/e2e-cr jobname:xfs-backup-restore-diff-node jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the litmusbook for percona deployment
