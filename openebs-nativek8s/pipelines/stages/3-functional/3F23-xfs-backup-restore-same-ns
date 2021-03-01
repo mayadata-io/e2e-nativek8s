@@ -220,7 +220,7 @@ bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-same-ns $t
 
 xfs_restore_same_ns_rc_val=$(echo $?)
 
-if [ "$xfs_restore_same_ns_rc_val" -eq "0" ]; then
+if [ "$xfs_restore_same_ns_rc_val" != "0" ]; then
 exit 1;
 fi
 

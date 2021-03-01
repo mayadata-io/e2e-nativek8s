@@ -221,7 +221,7 @@ bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-node 
 
 xfs_restore_diff_node_rc_val=$(echo $?)
 
-if [ "$xfs_restore_diff_node_rc_val" -eq "0" ]; then
+if [ "$xfs_restore_diff_node_rc_val" != "0" ]; then
 exit 1;
 fi
 

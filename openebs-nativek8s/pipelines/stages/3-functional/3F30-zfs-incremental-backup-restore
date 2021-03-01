@@ -218,7 +218,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-incr-backup-restore $test
 
 zfs_incr_restore_rc_val=$(echo $?)
 
-if [ "$zfs_incr_restore_rc_val" -eq "0" ]; then
+if [ "$zfs_incr_restore_rc_val" != "0" ]; then
 exit 1;
 fi
 
@@ -263,7 +263,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-incr-backup-restore $test
 
 app_deprovision_rc_val=$(echo $?)
 
-if [ "$app_deprovision_rc_val" != "0" ]; then
+if [ "$app_deprovision_rc_val" != "0" ] &&
    [ "$zfs_incr_restore_rc_val" -eq "0" ] &&
    [ "$zfs_incr_backup_rc_val" -eq "0" ] &&
    [ "$app_loadgen_rc_val" -eq "0" ] &&

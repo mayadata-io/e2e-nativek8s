@@ -221,7 +221,7 @@ bash openebs-nativek8s/utils/event_updater jobname:ext4-backup-restore-diff-node
 
 ext4_restore_diff_node_rc_val=$(echo $?)
 
-if [ "$ext4_restore_diff_node_rc_val" -eq "0" ]; then
+if [ "$ext4_restore_diff_node_rc_val" != "0" ]; then
 exit 1;
 fi
 

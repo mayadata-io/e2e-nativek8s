@@ -221,7 +221,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-backup-restore-diff-node 
 
 zfs_restore_diff_node_rc_val=$(echo $?)
 
-if [ "$zfs_restore_diff_node_rc_val" -eq "0" ]; then
+if [ "$zfs_restore_diff_node_rc_val" != "0" ]; then
 exit 1;
 fi
 
@@ -265,7 +265,7 @@ cd ..
 bash openebs-nativek8s/utils/event_updater jobname:zfs-backup-restore-diff-node $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
-if [ "$app_deprovision_rc_val" != "0" ]; then
+if [ "$app_deprovision_rc_val" != "0" ] &&
    [ "$zfs_restore_diff_node_rc_val" -eq "0" ] &&
    [ "$zfs_backup_diff_node_rc_val" -eq "0" ] &&
    [ "$app_loadgen_rc_val" -eq "0" ] &&
