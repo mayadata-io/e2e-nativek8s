@@ -229,7 +229,7 @@ bash openebs-nativek8s/utils/event_updater jobname:zfs-backup-restore-diff-ns $t
 
 zfs_restore_diff_ns_rc_val=$(echo $?)
 
-if [ "$zfs_restore_diff_ns_rc_val" -eq "0" ]; then
+if [ "$zfs_restore_diff_ns_rc_val" != "0" ]; then
 exit 1 ;
 fi
 
