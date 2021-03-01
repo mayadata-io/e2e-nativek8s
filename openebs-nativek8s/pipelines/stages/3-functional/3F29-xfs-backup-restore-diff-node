@@ -266,7 +266,7 @@ bash openebs-nativek8s/utils/event_updater jobname:xfs-backup-restore-diff-node 
 
 app_deprovision_rc_val=$(echo $?)
 
-if [ "$app_deprovision_rc_val" != "0" ] &&
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
    [ "$xfs_restore_diff_node_rc_val" -eq "0" ] &&
    [ "$xfs_backup_diff_node_rc_val" -eq "0" ] &&
    [ "$app_loadgen_rc_val" -eq "0" ] &&
