@@ -230,6 +230,9 @@ fi
 
 app_deprovision() {
 
+## Delete the namespace in which incremental restore was done.
+kubectl delete ns first-incr-restore-ns second-incr-restore-ns
+
 ## Generate the test name for running the litmusbook for percona deployment
 run_id="dep-zfs-incr-bkp-restore";test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=percona-deployment metadata=${run_id})
 echo $test_name
