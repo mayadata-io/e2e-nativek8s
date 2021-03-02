@@ -194,7 +194,6 @@ sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: zfs-restor
 -e "/name: VELERO_VERSION/{n;s/.*/            value: ${velero_version}/g}" \
 -e '/name: STORAGE_BUCKET/{n;s/.*/            value: minio/g}' \
 -e '/name: RESTORE_IN_DIFF_NAMESPACE/{n;s/.*/            value: "false"/g}' \
--e '/name: RESTORE_NAMESPACE/{n;s/.*/            value: zfs-restore-same-ns/g}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' zfs_restore_same_ns.yml
 
 sed -i '/command:/i \
