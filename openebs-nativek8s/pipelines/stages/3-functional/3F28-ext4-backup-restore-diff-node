@@ -267,7 +267,7 @@ bash openebs-nativek8s/utils/event_updater jobname:ext4-backup-restore-diff-node
 
 restore_app_deprovision_rc_val=$(echo $?)
 
-if [ "$restore_app_deprovision_rc_val" -eq "0" ]; then
+if [ "$restore_app_deprovision_rc_val" != "0" ]; then
 exit 1;
 fi
 
