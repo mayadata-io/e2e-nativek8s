@@ -1,0 +1,75 @@
+## Define the stages & order of execution
+
+stages:
+    - CLUSTER-SETUP
+    - PROVISIONER
+    - FUNCTIONAL-1
+    # - FUNCTIONAL-2
+    # - CHAOS
+    # - INFRA-CHAOS
+    - CLEANUP
+
+##################################
+
+1S01-KUBEADM-CLUSTER:
+  image: openebs/openshift-ci:latest
+  stage: CLUSTER-SETUP 
+  tags: 
+    - k8s-native
+  script:
+    - chmod 755 ./pipeline/stages/1-cluster-setup/1S01-cluster-setup
+    - ./pipeline/stages/1-cluster-setup/1S01-cluster-setup
+
+##################################
+
+.provisioner_test_template:
+  image: openebs/openshift-ci:latest
+  stage: PROVISIONER
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 1S01-KUBEADM-CLUSTER
+
+2P01-LVM-LOCALPV-PROVISIONER-DEPLOY:
+  extends: .provisioner_test_template
+  script:
+    - chmod 755 ./pipeline/stages/2-provisioner/2P01-lvm-localpv-provisioner
+    - ./pipeline/stages/2-provisioner/2P01-lvm-localpv-provisioner
+
+2P02-LVM-LOCALPV-CONTROLLER-HA:
+  extends: .provisioner_test_template
+  script:
+    - chmod 755 ./pipeline/stages/2-provisioner/2P02-lvm-controller-high-availability
+    - ./pipeline/stages/2-provisioner/2P02-lvm-controller-high-availability
+    
+##################################
+
+.func1_test_template:
+  image: openebs/openshift-ci:latest
+  stage: FUNCTIONAL-1
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+
+3F01-LVM-VOLUME-RESIZE:
+  extends: .func1_test_template
+  script:
+    - chmod 755 ./pipeline/stages/3-functional/3F01-lvm-volume-resize
+    - ./pipeline/stages/3-functional/3F01-lvm-volume-resize
+
+##################################
+
+6D01-CLUSTER-CLEANUP:
+  image: openebs/openshift-ci:latest
+  stage: CLEANUP
+  when: always
+  tags:
+    - k8s-native
+  dependencies:
+    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
+  script:
+    - chmod 775 ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
+    - ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
