@@ -5,7 +5,7 @@ echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $lvm_user@$ip -p $port 'git clone -b lvm-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s && bash pipeline/pipelines/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
 cleanup_cluster() {

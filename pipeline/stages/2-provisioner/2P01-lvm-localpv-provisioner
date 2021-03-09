@@ -26,9 +26,9 @@ time="date"
 current_time=$(eval $time)
 
 ## Create the e2e-result-custom-resources for the jobs
-bash pipeline/utils/e2e-cr jobname:lvm-localpv-provisioner jobphase:Waiting
-bash pipeline/utils/e2e-cr jobname:lvm-ctrl-high-availability jobphase:Waiting
-bash pipeline/utils/e2e-cr jobname:lvm-localpv-provisioner jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-localpv-provisioner jobphase:Waiting
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-ctrl-high-availability jobphase:Waiting
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-localpv-provisioner jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the e2e-test for deploying LVM LocalPV provisioner
 test_name=$(bash pipeline/utils/generate_test_name testcase=lvm-localpv-provisioner metadata="")
@@ -65,7 +65,7 @@ rc_val=$(echo $?)
 testResult=$(kubectl get e2eresult ${test_name} --no-headers -o custom-columns=:spec.testStatus.result)
 
 current_time=$(eval $time)
-bash pipeline/utils/e2e-cr jobname:lvm-localpv-provisioner jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:$testResult
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-localpv-provisioner jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:$testResult
 
 if [ "$rc_val" != "0" ]; then
 exit 1;
