@@ -69,7 +69,7 @@ stages:
   tags:
     - k8s-native
   dependencies:
-    - 2P01-ZFS-LOCALPV-PROVISIONER-DEPLOY
+    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
   script:
     - chmod 775 ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
     - ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
