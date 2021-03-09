@@ -18,6 +18,7 @@ This test takes the zfs volume snapshot and later use that snapshot to create cl
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/341395">341395</a>           |  create volume snapshot and clone when fstype is ext4           | Tue Mar  9 12:39:35 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/341352">341352</a>           |  create volume snapshot and clone when fstype is ext4           | Tue Mar  9 11:58:05 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/340748">340748</a>           |  create volume snapshot and clone when fstype is ext4           | Mon Mar  8 20:06:56 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/339828">339828</a>           |  create volume snapshot and clone when fstype is ext4           | Thu Mar  4 14:57:45 IST 2021  | Pass |
