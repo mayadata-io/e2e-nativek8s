@@ -24,8 +24,8 @@ time="date"
 current_time=$(eval $time)
 
 ## Create the e2e-result-custom-resources for the jobs
-bash pipeline/utils/e2e-cr jobname:lvm-volume-resize jobphase:Waiting
-bash pipeline/utils/e2e-cr jobname:lvm-volume-resize jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-volume-resize jobphase:Waiting
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-volume-resize jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the e2e-test for percona deployment
 test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-lvm-resize metadata="")
@@ -33,7 +33,7 @@ echo $test_name
 
 ## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd lvm-localpv/e2e-tests
-cp experiments/apps/percona/deployers/run_e2e_test.yml percona_lvm_resize.yml
+cp apps/percona/deployers/run_e2e_test.yml percona_lvm_resize.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-lvm-resize/g' \
@@ -108,7 +108,7 @@ echo $test_name
 
 # copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd lvm-localpv/e2e-tests
-cp experiments/apps/percona/deployers/run_e2e_test.yml percona_dep_lvm_resize.yml
+cp apps/percona/deployers/run_e2e_test.yml percona_dep_lvm_resize.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deprovision-lvm-resize/g' \
@@ -133,11 +133,11 @@ if [ "$app_deprovision_rc_val" -eq "0" ] &&
    [ "$app_deploy_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
-bash pipeline/utils/e2e-cr jobname:lvm-volume-resize jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-volume-resize jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 else
 ## Update the e2e-result-custom-resources for the job
-bash pipeline/utils/e2e-cr jobname:lvm-volume-resize jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+bash pipeline/utils/lvm-e2e-cr jobname:lvm-volume-resize jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 fi
 

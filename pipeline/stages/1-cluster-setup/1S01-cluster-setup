@@ -37,22 +37,18 @@ sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'git clo
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s && git clone https://github.com/openebs/lvm-localpv.git'
 
 echo "***Applying the e2e-CRD's yaml***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s/lvm-localpv && kubectl apply -f ./utils/e2e-crd.yml'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s/pipeline && kubectl apply -f ./utils/lvm-e2e-crd.yml'
 
 echo "***Applying rbac and crds yaml***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s/e2e-tests/hack && kubectl apply -f rbac.yaml && kubectl apply -f crds.yaml'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s/lvm-localpv/e2e-tests/hack && kubectl apply -f rbac.yaml && kubectl apply -f crds.yaml'
 
 echo "***Copying kube config for e2e-tests in e2e namespace***"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cp ~/.kube/config admin.conf && kubectl create cm kubeconfig --from-file=admin.conf -n e2e'
-
-echo "***Updating the test result in the readme***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'python3 e2e-nativek8s/lvm-localpv/utils/result/result_update.py '"'$CI_JOB_ID'"' 1S01 1-cluster-setup "Configure the cluster and get it ready" Pass '"'$CI_PIPELINE_ID'"' '"'$current_time'"' '"'$CI_COMMIT_SHA'"' '"'$gittoken'"''
 
 else
 echo "All nodes are not ready"
 echo "***Cluster is in Unhealthy state***"
 echo "***cloning e2e-nativek8s repo***"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'git clone -b lvm-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'python3 e2e-nativek8s/lvm-localpv/utils/result/result_update.py '"'$CI_JOB_ID'"' 1S01 1-cluster-setup "Configure the cluster and get it ready" Fail '"'$CI_PIPELINE_ID'"' '"'$current_time'"' '"'$CI_COMMIT_SHA'"' '"'$gittoken'"''
 exit 1;
 fi
