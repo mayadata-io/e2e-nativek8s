@@ -85,7 +85,7 @@ cat lvm_resize.yml
 bash ../../pipeline/utils/e2e_job_runner label='app:lvm-vol-resize' job=lvm_resize.yml
 ## Get the cluster state once the e2e job completed.
 bash ../../pipeline/utils/dump_cluster_state;
-cd ..
+cd ../..
 ## Update the e2e event for the job.
 bash pipeline/utils/event_updater jobname:lvm-volume-resize $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
