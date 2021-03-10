@@ -44,7 +44,7 @@ sed -i -e "/name: LVM_BRANCH/{n;s/value: master/value: ${lvm_branch}/g}" \
 -e "/name: OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" \
 -e '/name: VOLUME_GROUP_CREATION/{n;s/.*/            value: "true"/g}' \
 -e "/name: PHYSICAL_VOLUME_DISKS/{n;s/.*/            value: ${pv_disks}/g}" \
--e "/name: NODE_NAMES/{n;s/.*/            value: lvm-master,lvm-node1,lvm-node2,lvm-node3/g}" \
+-e "/name: NODE_NAMES/{n;s/.*/            value: lvm-node1,lvm-node2,lvm-node3/g}" \
 -e '/name: STORAGE_CLASS_CREATION/{n;s/.*/            value: "true"/g}' lvmpv_provisioner.yml
 
 cat lvmpv_provisioner.yml
