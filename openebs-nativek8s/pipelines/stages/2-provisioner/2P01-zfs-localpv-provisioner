@@ -2,7 +2,7 @@
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/2-provisioner/2P01-zfs-localpv-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_BRANCH'"' '"'$ZFS_DRIVER_IMAGE'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash openebs-nativek8s/pipelines/stages/2-provisioner/2P01-zfs-localpv-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_BRANCH'"' '"'$ZFS_DRIVER_IMAGE'"' '"'$ZPOOL_CREATION'"'
 
 }
 
@@ -17,6 +17,7 @@ pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 zfs_branch=$(echo $4)
 zfs_driver_image=$(echo $5)
+zpool_creation=$(echo $6)
 releaseTag=$(echo $5 | cut -d ":" -f 2)
 echo "releaseTag=$releaseTag"
 
@@ -43,7 +44,7 @@ cp experiments/zfs-localpv/zfs-localpv-provisioner/run_litmus_test.yml zfs_pv_pr
 sed -i -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfs-sc/g}' \
 -e "/name: ZFS_BRANCH/{n;s/.*/            value: ${zfs_branch}/g}" \
 -e "/name: ZFS_DRIVER_IMAGE/{n;s/.*/            value: ${zfs_driver_image}/g}" \
--e '/name: ZPOOL_CREATION/{n;s/.*/            value: "true"/g}' \
+-e "/name: ZPOOL_CREATION/{n;s/.*/            value: ${zpool_creation}/g}" \
 -e '/name: POOL_NAME/{n;s/.*/            value: zfs-test-pool/g}' \
 -e '/name: POOL_TYPE/{n;s/.*/            value: striped/g}' \
 -e '/name: ACTION/{n;s/.*/            value: provision/g}' \
