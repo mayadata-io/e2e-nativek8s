@@ -11,8 +11,8 @@ sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-
 cleanup_cluster() {
 job_id=$(echo $1)
 
-git clone https://github.com/openebs/lvm-localpv.git
-cd lvm-localpv/e2e-tests
+git clone https://github.com/openebs/e2e-tests.git
+cd e2e-tests
 
 # Replace the VM IP In csv file
 sed -i -e 's/10.12.22.10/10.57.1.220/g' \
