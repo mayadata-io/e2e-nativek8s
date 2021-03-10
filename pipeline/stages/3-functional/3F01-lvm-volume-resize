@@ -38,7 +38,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_lvm_resize.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-lvm-resize/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deploy-lvm-resize-/g' \
--e 's/value: app-percona-ns/value: lvm-resize/g' percona_lvm_resize.yml
+-e "s/value: 'percona'/value: 'lvm-resize'/g" percona_lvm_resize.yml
 
 cat percona_lvm_resize.yml
 
@@ -114,7 +114,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_lvm_resize.yml
 sed -i -e 's/app: percona-deployment/app: percona-deprovision-lvm-resize/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-lvm-resize-/g' \
 -e 's/value: provision/value: deprovision/g' \
--e 's/value: app-percona-ns/value: lvm-resize/g' percona_dep_lvm_resize.yml       
+-e "s/value: 'percona'/value: 'lvm-resize'/g" percona_dep_lvm_resize.yml       
 
 cat percona_dep_lvm_resize.yml
 
