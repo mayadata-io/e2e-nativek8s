@@ -82,7 +82,7 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: lvm-resize/g}' \
 cat lvm_resize.yml
 
 ## Run the e2e-test job and get the details of the job from e2e_job_runner utils.
-bash ../../pipeline/utils/e2e_job_runner label='app:lvm-volume-resize' job=lvm_resize.yml
+bash ../../pipeline/utils/e2e_job_runner label='app:lvm-vol-resize' job=lvm_resize.yml
 ## Get the cluster state once the e2e job completed.
 bash ../../pipeline/utils/dump_cluster_state;
 cd ..
