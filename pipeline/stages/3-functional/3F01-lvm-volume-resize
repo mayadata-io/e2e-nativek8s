@@ -113,7 +113,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_lvm_resize.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deprovision-lvm-resize/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-lvm-resize-/g' \
--e 's/value: provision/value: deprovision/g' \
+-e "s/value: 'provision'/value: 'deprovision'/g" \
 -e "s/value: 'percona'/value: 'lvm-resize'/g" percona_dep_lvm_resize.yml       
 
 cat percona_dep_lvm_resize.yml
@@ -129,7 +129,7 @@ bash pipeline/utils/event_updater jobname:lvm-volume-resize $test_name jobid:"$j
 app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" -eq "0" ] &&
-   [ "$lvm_vol_resize_rc_val" -eq "0" ] &&
+   [ "$lvm_volume_resize_rc_val" -eq "0" ] &&
    [ "$app_deploy_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
@@ -145,7 +145,7 @@ fi
 
 if [ "$1" == "run_job" ];then
   app_deploy $2 $3 $4
-  lvm_vol_resize
+  lvm_volume_resize
   app_deprovision
 else
   connect_cluster
