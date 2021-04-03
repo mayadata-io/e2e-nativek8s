@@ -183,7 +183,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  app_deploy $2 $3 $4
+  app_deploy $2 $3 $4 $5 $6 $7 $8
   app_loadgen
   node_power_failure
   app_deprovision
