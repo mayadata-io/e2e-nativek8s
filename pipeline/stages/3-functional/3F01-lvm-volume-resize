@@ -31,7 +31,7 @@ bash pipeline/utils/lvm-e2e-cr jobname:lvm-volume-resize jobphase:Running init_t
 test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-lvm-resize metadata="")
 echo $test_name
 
-## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
+## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd lvm-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_lvm_resize.yml
 
