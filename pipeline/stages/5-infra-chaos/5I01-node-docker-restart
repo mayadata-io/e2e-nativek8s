@@ -1,0 +1,196 @@
+#!/bin/bash
+
+### Taint the node to run infra chaos test scripts
+node_name=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR "kubectl taint nodes $node_name infra-aid=observer:NoSchedule"
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR "mkdir infra && echo $node_name >> infra/node_name"
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-infra-chaos/5I01-node-docker-restart run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"' '"'$LVM_NODE_PASSWORD'"'
+
+}
+
+#######################################
+# Deploy percona application on LVMPV #
+#######################################
+
+app_deploy() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+observer_node=$(echo $4)
+lvm_node_pwd=$(echo $5)
+
+time="date"
+current_time=$(eval $time)
+
+## Create the e2e-result-custom-resources for the jobs
+bash pipeline/utils/e2e-cr jobname:node-docker-restart jobphase:Waiting
+bash pipeline/utils/e2e-cr jobname:node-kubelet-restart jobphase:Waiting
+bash pipeline/utils/e2e-cr jobname:node-power-failure jobphase:Waiting
+bash pipeline/utils/e2e-cr jobname:node-docker-restart jobphase:Running init_time:"$current_time" jobid:"$job_id"
+
+## Generate the test name for running the e2e-test for percona deployment
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-docker-restart metadata="")
+echo $test_name
+
+## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd lvm-localpv/e2e-tests
+cp apps/percona/deployers/run_e2e_test.yml percona_docker_restart.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-deployment-docker-restart/g' \
+-e 's/generateName: percona-deploy-/generateName: percona-deploy-docker-restart-/g' \
+-e "s/value: 'percona'/value: 'docker-restart'/g" percona_docker_restart.yml
+
+cat percona_docker_restart.yml
+
+## Run the e2e-test job and get the details of the job from e2e_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='app:percona-deployment-docker-restart' job=percona_docker_restart.yml
+## Get the cluster state once the e2e-test job completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:node-docker-restart $test_name jobid:"$job_id" pipelineid:"$pipeline_id"
+
+app_deploy_rc_val=$(echo $?)
+if [ "$app_deploy_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+######################
+#    App loadgen     #
+######################
+
+app_loadgen() {
+
+## Generate test name for running test for generate load on application
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-loadgen-docker-restart metadata='')
+echo $test_name
+
+## copy the content of workload run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd lvm-localpv/e2e-tests
+cp apps/percona/workload/run_e2e_test.yml loadgen_docker_restart.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: percona-loadjob-docker-restart/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-node-docker-restart-/g' \
+-e "s/value: 'percona'/value: 'docker-restart'/g" loadgen_docker_restart.yml
+
+cat loadgen_docker_restart.yml
+
+## Run the e2e-test job and get the details of the job from e2e_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='loadgen:percona-loadjob-docker-restart' job=loadgen_docker_restart.yml
+## Get the cluster state Once the e2e-test jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:node-docker-restart $test_name jobid:"$job_id" pipelineid:"$pipeline_id"
+
+app_loadgen_rc_val=$(echo $?)
+if [ "$app_loadgen_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+##############################
+#    node docker restart     #
+#############################
+
+node_docker_restart() {
+
+## Generate test name for running test for node_docker_restart infra-chaos test
+test_name=$(bash pipeline/utils/generate_test_name testcase=docker-service-failure metadata='')
+echo $test_name
+
+## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd lvm-localpv/e2e-tests
+cp experiments/infra-chaos/service_failure/run_e2e_test.yml node_docker_restart.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/test: service-failure-chaos/test: docker-service-failure-chaos/g' \
+-e 's/generateName: service-failure-chaos-/generateName: docker-service-failure-chaos-/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: docker-restart/g}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
+-e '/name: SVC_TYPE/{n;s/.*/            value: docker/g}' \
+-e '/name: USERNAME/{n;s/.*/            value: k8s/g}' \
+-e "s/nodePassword:/nodePassword: ${lvm_node_pwd}/g" \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' node_docker_restart.yml
+
+sed -i -e "s|#nodeSelector|nodeSelector|g" \
+-e "s|#  kubernetes.io/hostname:|  kubernetes.io/hostname: ${observer_node}|g" node_docker_restart.yml
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: service_failure
+' node_docker_restart.yml
+
+cat node_docker_restart.yml
+
+## Run the e2e-test job and get the details of the job from e2e_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='test:docker-service-failure-chaos' job=node_docker_restart.yml
+## Get the cluster state Once the e2e-test jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:node-docker-restart $test_name jobid:"$job_id" pipelineid:"$pipeline_id"
+
+node_docker_restart_rc_val=$(echo $?)
+if [ "$node_docker_restart_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+##########################
+#    App deprovision     #
+#########################
+
+app_deprovision() {
+
+## Generate the test name for running the e2e-test for percona deprovision
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-deprovision-docker-restart metadata="")
+echo $test_name
+
+## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd lvm-localpv/e2e-tests
+cp apps/percona/deployers/run_e2e_test.yml percona_dep_docker_restart.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/app: percona-deployment/app: percona-deprovision-docker-restart/g' \
+-e 's/generateName: percona-deploy-/generateName: percona-deprovision-docker-restart-/g' \
+-e "s/value: 'provision'/value: 'deprovision'/g" \
+-e "s/value: 'percona'/value: 'docker-restart'/g" percona_dep_docker_restart.yml
+
+cat percona_dep_docker_restart.yml
+
+## Run the e2e-test job and get the details of the job from e2e_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-docker-restart' job=percona_dep_docker_restart.yml
+## Get the cluster state once the e2e-test job completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:node-docker-restart $test_name jobid:"$job_id" pipelineid:"$pipeline_id"
+
+app_deprovision_rc_val=$(echo $?)
+if [ "$app_deprovision_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+if [ "$1" == "run_job" ];then
+  app_deploy $2 $3 $4 $5 $6
+  app_loadgen
+  node_docker_restart
+  app_deprovision
+else
+  connect_cluster
+fi

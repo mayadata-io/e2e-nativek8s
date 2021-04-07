@@ -5,8 +5,8 @@ stages:
     - PROVISIONER
     - FUNCTIONAL-1
     # - FUNCTIONAL-2
-    # - CHAOS
-    # - INFRA-CHAOS
+    - CHAOS
+    - INFRA-CHAOS
     - CLEANUP
 
 ##################################
@@ -60,6 +60,52 @@ stages:
     - chmod 755 ./pipeline/stages/3-functional/3F01-lvm-volume-resize
     - ./pipeline/stages/3-functional/3F01-lvm-volume-resize
 
+##################################
+
+.chaos_template:
+  image: openebs/openshift-ci:latest
+  stage: CHAOS
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+
+4C01-APP-POD-FAILURE:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./pipeline/stages/4-chaos/4C01-application-pod-failure
+    - ./pipeline/stages/4-chaos/4C01-application-pod-failure
+
+##################################
+
+.infra_chaos_template:
+  image: openebs/openshift-ci:latest
+  stage: INFRA-CHAOS
+  tags:
+    - k8s-native
+  when: always
+  dependencies:
+    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+
+5I01-NODE-DOCKER-RESTART:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./pipeline/stages/5-infra-chaos/5I01-node-docker-restart
+    - ./pipeline/stages/5-infra-chaos/5I01-node-docker-restart
+  
+5I02-NODE-KUBELET-RESTART:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./pipeline/stages/5-infra-chaos/5I02-node-kubelet-restart
+    - ./pipeline/stages/5-infra-chaos/5I02-node-kubelet-restart
+
+5I03-NODE-POWER-FAILURE:
+  extends: .infra_chaos_template
+  script:
+    - chmod 755 ./pipeline/stages/5-infra-chaos/5I03-node-power-failure
+    - ./pipeline/stages/5-infra-chaos/5I03-node-power-failure
+    
 ##################################
 
 6D01-CLUSTER-CLEANUP:
