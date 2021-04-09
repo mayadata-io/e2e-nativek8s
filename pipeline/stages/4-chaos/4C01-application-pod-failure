@@ -162,17 +162,14 @@ bash pipeline/utils/event_updater jobname:application-pod-failure $test_name job
 app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" != "0" ]; then
+
+bash pipeline/utils/e2e-cr jobname:application-pod-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
+
 fi
 
 ## Update the e2e-result-custom-resources for the job
 bash pipeline/utils/e2e-cr jobname:application-pod-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
-
-else
-## Update the e2e-result-custom-resources for the job
-bash pipeline/utils/e2e-cr jobname:application-pod-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
-exit 1;
-fi
 
 }
 

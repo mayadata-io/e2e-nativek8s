@@ -176,9 +176,15 @@ cd ../..
 bash pipeline/utils/event_updater jobname:node-power-failure $test_name jobid:"$job_id" pipelineid:"$pipeline_id"
 
 app_deprovision_rc_val=$(echo $?)
+
 if [ "$app_deprovision_rc_val" != "0" ]; then
+
+bash pipeline/utils/e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
+
 fi
+
+bash pipeline/utils/e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 }
 
