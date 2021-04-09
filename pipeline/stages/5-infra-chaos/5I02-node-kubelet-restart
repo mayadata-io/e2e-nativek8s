@@ -25,7 +25,7 @@ current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
 bash pipeline/utils/pooling jobname:node-docker-restart
-bash pipeline/utils/e2e-cr jobname:node-kubelet-restart jobphase:Running init_time:"$current_time" jobid:"$job_id"
+bash pipeline/utils/lvm-e2e-cr jobname:node-kubelet-restart jobphase:Running init_time:"$current_time" jobid:"$job_id"
 
 ## Generate the test name for running the e2e-test for percona deployment
 test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-kubelet-restart metadata="")
@@ -38,6 +38,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_kubelet_restart.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-kubelet-restart/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deploy-kubelet-restart-/g' \
+-e "s/value: 'openebs-lvmsc'/value: 'openebs-lvmsc-wfc'/g" \
 -e "s/value: 'percona'/value: 'kubelet-restart'/g" percona_kubelet_restart.yml
 
 cat percona_kubelet_restart.yml
@@ -178,12 +179,12 @@ app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" != "0" ]; then
 
-bash pipeline/utils/e2e-cr jobname:node-kubelet-restart jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+bash pipeline/utils/lvm-e2e-cr jobname:node-kubelet-restart jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 
 fi
 
-bash pipeline/utils/e2e-cr jobname:node-kubelet-restart jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+bash pipeline/utils/lvm-e2e-cr jobname:node-kubelet-restart jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 }
 
