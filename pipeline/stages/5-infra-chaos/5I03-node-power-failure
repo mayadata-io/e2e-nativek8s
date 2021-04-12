@@ -108,7 +108,7 @@ echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd lvm-localpv/e2e-tests
-cp experiments/infra-chaos/node_failure/run_e2e_test.yml node_power_failure.yml
+cp experiments/infra-chaos/node_power_failure/run_e2e_test.yml node_power_failure.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: node-power-failure/g}' \
