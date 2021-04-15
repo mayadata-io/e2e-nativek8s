@@ -13,6 +13,7 @@ This test checks the health of the cluster, status of nodes and clones the requi
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/354073">354073</a>           |  Configure the cluster and get it ready           | Thu Apr 15 06:51:12 UTC 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/353883">353883</a>           |  Configure the cluster and get it ready           | Thu Apr 15 04:23:35 UTC 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/353588">353588</a>           |  Configure the cluster and get it ready           | Wed Apr 14 06:07:04 UTC 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/353523">353523</a>           |  Configure the cluster and get it ready           | Wed Apr 14 03:53:43 UTC 2021  | Pass |
