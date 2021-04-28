@@ -8,6 +8,7 @@ This functional test validates the raw block volume support for zfs-localpv. For
 
 | Job ID  |      Test Description         | Execution Time |   Test Result   |
 |---------|-------------------------------|----------------|-----------------|
+|     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/358173">358173</a>           |  verify the zfspv-raw-block-volume support           | Wed Apr 28 22:06:58 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/354077">354077</a>           |  verify the zfspv-raw-block-volume support           | Thu Apr 15 13:01:31 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/353887">353887</a>           |  verify the zfspv-raw-block-volume support           | Thu Apr 15 10:34:58 IST 2021  | Pass |
 |     <a href="https://gitlab.openebs.ci/openebs/e2e-nativek8s/-/jobs/353527">353527</a>           |  verify the zfspv-raw-block-volume support           | Wed Apr 14 10:05:39 IST 2021  | Pass |
