@@ -66,12 +66,6 @@ stages:
     - chmod 755 ./pipeline/stages/3-functional/3F02-lvm-volume-resize-xfs
     - ./pipeline/stages/3-functional/3F02-lvm-volume-resize-xfs
 
-3F03-LVMPV-VOLUME-RESIZE-BTRFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F03-lvm-volume-resize-btrfs
-    - ./pipeline/stages/3-functional/3F03-lvm-volume-resize-btrfs
-
 3F04-LVMPV-CUSTOM-TOPOLOGY:
   extends: .func1_test_template
   script:
