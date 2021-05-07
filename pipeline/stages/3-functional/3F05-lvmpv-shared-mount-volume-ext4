@@ -79,7 +79,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  run_job $2 $3 $4
+  lvmpv_shared_mount_ext4 $2 $3 $4
 else
   connect_cluster
 fi
