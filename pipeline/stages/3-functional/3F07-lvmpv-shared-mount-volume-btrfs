@@ -22,9 +22,9 @@ time="date"
 current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
-bash pipeline/utils/pooling jobname:lvmpv-custom-topology
-bash pipeline/utils/e2e-cr jobname:lvmpv-shared-mount-volume-btrfs jobphase:Waiting
-bash pipeline/utils/e2e-cr jobname:lvmpv-shared-mount-volume-btrfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/pooling jobname:lvmpv-shared-mount-volume-xfs
+bash pipeline/utils/lvm-e2e-cr jobname:lvmpv-shared-mount-volume-btrfs jobphase:Waiting
+bash pipeline/utils/lvm-e2e-cr jobname:lvmpv-shared-mount-volume-btrfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for performing the test for lvmpv shared mount
 run_id="btrfs";test_name=$(bash pipeline/utils/generate_test_name testcase=lvmpv-shared-mount-volume metadata=${run_id})
