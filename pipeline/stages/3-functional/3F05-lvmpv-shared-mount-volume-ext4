@@ -2,7 +2,7 @@
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F05-lvmpv-shared-mount-volume-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F05-lvmpv-shared-mount-volume-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
 
 }
 

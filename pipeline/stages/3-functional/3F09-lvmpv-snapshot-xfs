@@ -78,7 +78,7 @@ sed -i -e 's/name: lvmpv-snapshot/name: lvmpv-snapshot-xfs/g' \
 -e "/name: LVM_OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" \
 -e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: lvmpv-snapclass/g}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snap-xfs/g}' \
--e '/name: DATA_PERSISTENCE/{n;s/.*/            value: busybox/g}' lvmpv_snap_xfs.yml
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' lvmpv_snap_xfs.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -131,7 +131,7 @@ sed -i -e 's/name: lvmpv-snapshot/name: lvmpv-snapshot-xfs-dep/g' \
 -e "/name: LVM_OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" \
 -e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: lvmpv-snapclass/g}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: snap-xfs/g}' \
--e '/name: DATA_PERSISTENCE/{n;s/.*/            value: busybox/g}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' \
 -e "/name: ACTION/{n;s/value: 'provision'/value: 'deprovision'/g}" lvmpv_snap_xfs_dep.yml
 
 sed -i '/command:/i \
