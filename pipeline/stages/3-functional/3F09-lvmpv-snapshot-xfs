@@ -36,7 +36,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_snap_xfs.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-snap-xfs/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deploy-snap-xfs-/g' \
--e "/name: STORAGE_CLASS/{n;s/value: 'openebs-lvmsc'/value: 'openebs-lvmsc-xfs'/g}"
+-e "/name: STORAGE_CLASS/{n;s/value: 'openebs-lvmsc'/value: 'openebs-lvmsc-xfs'/g}" \
 -e "s/value: 'percona'/value: 'snap-xfs'/g" percona_snap_xfs.yml
 
 cat percona_snap_xfs.yml

@@ -38,7 +38,7 @@ cp experiments/functional/lvmpv-shared-mount/run_e2e_test.yml lvmpv_shared_mount
 # Modify test specific values in runner file using sed command
 sed -i -e 's/name: lvmpv-shared-mount/name: lvmpv-shared-mount-xfs/g' \
 -e 's/test: shared-mount/test: shared-mount-xfs/g' \
--e "/name: STORAGE_CLASS/{n;s/value: 'lvmsc-ext4-shared'/value: 'lvmsc-xfs-shared'/g}"
+-e "/name: STORAGE_CLASS/{n;s/value: 'lvmsc-ext4-shared'/value: 'lvmsc-xfs-shared'/g}" \
 -e "/name: APP_NAMESPACE/{n;s/value: 'share-ns'/value: 'share-ns-xfs'/g}" lvmpv_shared_mount_xfs.yml
 
 sed -i '/command:/i \
