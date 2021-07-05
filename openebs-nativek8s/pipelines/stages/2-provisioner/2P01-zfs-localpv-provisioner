@@ -39,7 +39,7 @@ bash openebs-nativek8s/utils/zfs-e2e-cr jobname:zfs-ctrl-high-availability jobph
 bash openebs-nativek8s/utils/zfs-e2e-cr jobname:zfs-localpv-provisioner jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the litmusbook for deploying ZFS LocalPV provisioner
-test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfspv-provisioner metadata="")
+test_name=$(bash openebs-nativek8s/utils/generate_test_name testcase=zfs-localpv-provisioner metadata="")
 echo $test_name
 
 # copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.

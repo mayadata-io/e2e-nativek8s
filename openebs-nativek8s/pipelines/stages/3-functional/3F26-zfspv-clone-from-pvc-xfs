@@ -172,7 +172,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_clone_from_pvc_xfs.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: pvc-clone-xfs'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-pvc-clone-xfs/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-pvc-clone-xfs-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_clone_from_pvc_xfs.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_clone_from_pvc_xfs.yml
 
 cat percona_dep_clone_from_pvc_xfs.yml
 

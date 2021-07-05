@@ -126,7 +126,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_deprovision_zfs_property_modi
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'zfs-property-modify'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-zfs-property-modify/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-zfs-property-modify-/g' \
--e 's/value: provision/value: deprovision/g' percona_deprovision_zfs_property_modify.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_deprovision_zfs_property_modify.yml
 
 cat percona_deprovision_zfs_property_modify.yml
 

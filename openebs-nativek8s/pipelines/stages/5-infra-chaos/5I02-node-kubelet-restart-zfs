@@ -176,7 +176,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_zfs_kubelet_deprovision.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'zfs-kubelet'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-zfs-kubelet-restart/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-zfs-kubelet-restart-/g' \
--e 's/value: provision/value: deprovision/g' percona_zfs_kubelet_deprovision.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_zfs_kubelet_deprovision.yml
 
 cat percona_zfs_kubelet_deprovision.yml
 

@@ -243,7 +243,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_xfs_bkp_same_ns.yml
 sed -i -e 's/app: percona-deployment/app: percona-dep-xfs-bkp-same-ns/g' \
 -e 's/generateName: litmus-percona-/generateName: litmus-percona-dep-xfs-bkp-restore-same-ns/g' \
 -e 's/value: openebs-standard/value: zfs-sc-xfs/g' \
--e 's/value: provision/value: deprovision/g' \
+-e "s/value: 'provision'/value: 'deprovision'/g" \
 -e '/name: TARGET_AFFINITY_CHECK/{n;s/value: enable/value: disable/g}' \
 -e 's/value: app-percona-ns/value: xfs-bkp-same-ns/g' percona_dep_xfs_bkp_same_ns.yml
 

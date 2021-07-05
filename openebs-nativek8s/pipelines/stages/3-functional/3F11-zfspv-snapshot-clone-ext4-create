@@ -321,7 +321,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_ext4_snap_clone_dep.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-snap'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-ext4-snap/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-ext4-snap-/g' \
--e 's/value: provision/value: deprovision/g' percona_ext4_snap_clone_dep.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_ext4_snap_clone_dep.yml
 
 cat percona_ext4_snap_clone_dep.yml
 

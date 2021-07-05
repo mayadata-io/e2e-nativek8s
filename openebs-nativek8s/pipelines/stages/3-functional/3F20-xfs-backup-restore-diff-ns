@@ -234,7 +234,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_xfs_restore_diff_ns.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'xfs-restore-diff-ns'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-xfs-restore-diff-ns/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-xfs-restore-diff-ns-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_xfs_restore_diff_ns.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_xfs_restore_diff_ns.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -277,7 +277,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_xfs_bkp_diff_ns.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'xfs-bkp-diff-ns'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-xfs-bkp-diff-ns/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-xfs-bkp-diff-ns-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_xfs_bkp_diff_ns.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_xfs_bkp_diff_ns.yml
 
 cat percona_dep_xfs_bkp_diff_ns.yml
 

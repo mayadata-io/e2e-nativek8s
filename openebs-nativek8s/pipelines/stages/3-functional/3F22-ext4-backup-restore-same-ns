@@ -234,7 +234,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_ext4_restore_same_ns.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-restore-same-ns'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-ext4-restore-same-ns/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-ext4-restore-same-ns-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_ext4_restore_same_ns.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_ext4_restore_same_ns.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -277,7 +277,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_ext4_bkp_same_ns.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-bkp-same-ns'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-ext4-bkp-same-ns/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-ext4-bkp-same-ns-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_ext4_bkp_same_ns.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_ext4_bkp_same_ns.yml
 
 cat percona_dep_ext4_bkp_same_ns.yml
 
