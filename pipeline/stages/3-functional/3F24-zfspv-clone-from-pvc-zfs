@@ -1,0 +1,213 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_deploy_rc_val=1
+app_loadgen_rc_val=1
+clone_from_pvc_zfs_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F24-zfspv-clone-from-pvc-zfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
+
+}
+
+#######################################
+# Deploy percona application on ZFSPV #
+#######################################
+
+app_deploy() {
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+zfs_operator_namespace=$(echo $4)
+source ~/.profile
+gittoken=$(echo "$github_token")
+
+time="date"
+current_time=$(eval $time)
+
+## Pooling over the previous job to wait for its completion
+bash pipeline/utils/zfs-e2e-cr jobname:zfspv-clone-from-pvc-zfs jobphase:Waiting
+bash pipeline/utils/zfs-e2e-cr jobname:zfspv-clone-from-pvc-zfs jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+## Generate the test name for running the litmusbook for percona deployment
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-pvc-clone-zfs metadata='')
+echo $test_name
+
+## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd zfs-localpv/e2e-tests
+cp apps/percona/deployers/run_e2e_test.yml percona_clone_from_pvc_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'pvc-clone-zfs'/g}" \
+-e 's/generateName: percona-deploy-/generateName: percona-deploy-pvc-clone-zfs-/g' \
+-e 's/app: percona-deployment/app: percona-deploy-pvc-clone-zfs/g' percona_clone_from_pvc_zfs.yml
+
+cat percona_clone_from_pvc_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='app:percona-deploy-pvc-clone-zfs' job=percona_clone_from_pvc_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deploy_rc_val=$(echo $?)
+if [ "$app_deploy_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+################
+#  App_Loaden  #
+################
+
+app_loadgen() {
+
+## Generate test name for running litmusbook for generate load on application
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-loadgen-pvc-clone-zfs metadata='')
+echo $test_name
+cd zfs-localpv/e2e-tests
+
+# copy the content of workload run_e2e_test.yml into a different file to update the test specific parameters.
+cp apps/percona/workload/run_e2e_test.yml loadgen_clone_from_pvc_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/loadgen: percona-loadjob/loadgen: percona-loadjob-pvc-clone-zfs/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-pvc-clone-zfs-/g' \
+-e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'pvc-clone-zfs'/g}" loadgen_clone_from_pvc_zfs.yml
+
+cat loadgen_clone_from_pvc_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='loadgen:percona-loadjob-pvc-clone-zfs' job=loadgen_clone_from_pvc_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_loadgen_rc_val=$(echo $?)
+if [ "$app_loadgen_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+#############################################################
+#  Create clone directly from pvc when file-system is zfs   #
+#############################################################
+
+clone_from_pvc_zfs() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="zfs";test_name=$(bash pipeline/utils/generate_test_name testcase=zfspv-clone-from-pvc metadata=${run_id})
+echo $test_name
+
+## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd zfs-localpv/e2e-tests
+cp experiments/functional/zfspv-clone-directly-from-pvc/run_e2e_test.yml clone_from_pvc_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: pvc-clone-zfs/g}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/g}" \
+-e '/name: PARENT_PVC_NAME/{n;s/.*/            value: percona-pvc/g}' \
+-e '/name: CLONE_PVC_NAME/{n;s/.*/            value: clone-pvc-zfs/g}' \
+-e '/name: APP_NAME/{n;s/.*/            value: percona/g}' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' \
+-e 's/generateName: zfspv-clone-from-pvc-/generateName: clone-from-pvc-zfs-/g' \
+-e 's/name: zfspv-clone-from-pvc/name: clone-from-pvc-zfs/g' \
+-e 's/test: zfspv-clone-from-pvc/test: clone-from-pvc-zfs/g' clone_from_pvc_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' clone_from_pvc_zfs.yml
+
+
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: pvc_clone_zfs
+' clone_from_pvc_zfs.yml
+
+cat clone_from_pvc_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='test:clone-from-pvc-zfs' job=clone_from_pvc_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+clone_from_pvc_zfs_rc_val=$(echo $?)
+if [ "$clone_from_pvc_zfs_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+
+#######################################
+#   Deprovision percona application   #
+#######################################
+
+app_deprovision() {
+
+## Generate the test name for running the litmusbook for percona deployment
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-deprovision-pvc-clone-zfs metadata='')
+echo $test_name
+
+## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd zfs-localpv/e2e-tests
+cp apps/percona/deployers/run_e2e_test.yml percona_dep_clone_from_pvc_zfs.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: pvc-clone-zfs'/g}" \
+-e 's/app: percona-deployment/app: percona-deprovision-pvc-clone-zfs/g' \
+-e 's/generateName: percona-deploy-/generateName: percona-deprovision-pvc-clone-zfs-/g' \
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_clone_from_pvc_zfs.yml
+
+cat percona_dep_clone_from_pvc_zfs.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-pvc-clone-zfs' job=percona_dep_clone_from_pvc_zfs.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-clone-from-pvc-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_rc_val=$(echo $?)
+
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
+   [ "$clone_from_pvc_zfs_rc_val" -eq "0" ] &&
+   [ "$app_loadgen_rc_val" -eq "0" ] &&
+   [ "$app_deploy_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash pipeline/utils/zfs-e2e-cr jobname:zfspv-clone-from-pvc-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+#python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F24 3-functional "Creation of clone directly from pvc when fstype is zfs" Pass $pipeline_id "$current_time" $commit_id $gittoken
+
+else
+## Update the e2e-result-custom-resources for the job
+bash pipeline/utils/zfs-e2e-cr jobname:zfspv-clone-from-pvc-zfs jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+#python3 openebs-nativek8s/utils/result/result_update.py $job_id 3F24 3-functional "Creation of clone directly from pvc when fstype is zfs" Fail $pipeline_id "$current_time" $commit_id $gittoken
+exit 1;
+fi
+
+}
+
+if [ "$1" == "run_job" ];then
+  app_deploy $2 $3 $4
+  app_loadgen
+  clone_from_pvc_zfs
+  app_deprovision
+else
+  connect_cluster
+fi
