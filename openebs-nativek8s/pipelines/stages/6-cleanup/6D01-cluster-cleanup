@@ -4,15 +4,15 @@ connect_cluster() {
 echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $user@$ip -p $port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $user@$ip -p $port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $zfs_user@$zfs_ip -p $zfs_port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'cd e2e-nativek8s && git checkout release-branch && bash openebs-nativek8s/pipelines/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
 cleanup_cluster() {
 job_id=$(echo $1)
 
 git clone https://github.com/openebs/e2e-tests.git
-cd e2e-tests
+cd zfs-localpv/e2e-tests
 
 # Replace the VM IP In csv file
 sed -i -e 's/10.12.22.10/10.34.1.220/g' \
