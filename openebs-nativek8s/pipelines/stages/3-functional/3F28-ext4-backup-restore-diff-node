@@ -235,7 +235,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_ext4_restore_diff_node.ym
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-restore-diff-node'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-ext4-restore-diff-node/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-ext4-restore-diff-node-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_ext4_restore_diff_node.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_ext4_restore_diff_node.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -277,7 +277,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_dep_ext4_bkp_diff_node.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-bkp-diff-node'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-ext4-bkp-diff-node/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-ext4-bkp-diff-node-/g' \
--e 's/value: provision/value: deprovision/g' percona_dep_ext4_bkp_diff_node.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_ext4_bkp_diff_node.yml
 
 cat percona_dep_ext4_bkp_diff_node.yml
 

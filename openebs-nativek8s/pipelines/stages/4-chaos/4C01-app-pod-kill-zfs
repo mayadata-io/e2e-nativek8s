@@ -161,7 +161,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_deprovision_app_kill_zfs.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'app-kill-zfs'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-app-kill-zfs/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-app-kill-zfs-/g' \
--e 's/value: provision/value: deprovision/g' percona_deprovision_app_kill_zfs.yml     
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_deprovision_app_kill_zfs.yml     
 
 cat percona_deprovision_app_kill_zfs.yml
 

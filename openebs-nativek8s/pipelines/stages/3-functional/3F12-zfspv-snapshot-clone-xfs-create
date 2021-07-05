@@ -321,7 +321,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_xfs_snap_clone_dep.yml
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'xfs-snap'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-xfs-snap/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-xfs-snap-/g' \
--e 's/value: provision/value: deprovision/g' percona_xfs_snap_clone_dep.yml
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_xfs_snap_clone_dep.yml
 
 cat percona_xfs_snap_clone_dep.yml
 
