@@ -208,7 +208,7 @@ sed -i -e 's/generateName: zfspv-clone-/generateName: zfspv-clone-deprovision-/g
 -e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfspv-sc/}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: zfs-snapshot/}' \
--e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
 -e '/name: ACTION/{n;s/.*/            value: deprovision/}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' zfs_clone_deprovision.yml

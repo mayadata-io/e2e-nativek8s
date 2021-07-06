@@ -80,7 +80,7 @@ sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: zfs-zv-prop
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: zfs-property-modify/}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/}' \
 -e '/name: FILE_SYSTEM_TYPE/{n;s/.*/            value: zfs/}' \
--e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${zfs_operator_namespace}/g}" \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/}' \
 -e '/name: NEW_COMPRESSION_PARAMETER/{n;s/.*/            value: "on"/}' \
 -e '/name: NEW_DEDUP_PARAMETER/{n;s/.*/            value: "on"/}' \

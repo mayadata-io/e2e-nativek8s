@@ -68,7 +68,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  run_job $2 $3 $4
+  run_job $2 $3 $4 $5
 else
   connect_cluster
 fi
