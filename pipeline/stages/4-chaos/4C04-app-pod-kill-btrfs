@@ -76,7 +76,7 @@ cd zfs-localpv/e2e-tests
 cp apps/percona/workload/run_e2e_test.yml loadgen_app_kill_btrfs.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e 's/loadgen: percona-loadjob/loadgen: percona-loadjob-app-kill-xfx/g' \
+sed -i -e 's/loadgen: percona-loadjob/loadgen: percona-loadjob-app-kill-btrfs/g' \
 -e 's/generateName: percona-loadgen-/generateName: percona-loadgen-app-kill-btrfs-/g' \
 -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'app-kill-btrfs'/g}" loadgen_app_kill_btrfs.yml
 
