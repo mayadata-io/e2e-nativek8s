@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lvm-e2e
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lvm-e2e
+  namespace: lvm-e2e
+  labels:
+    name: lvm-e2e
+---
+# Source: openebs/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: lvm-e2e
+  labels:
+    name: lvm-e2e
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: lvm-e2e
+  labels:
+    name: lvm-e2e
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: lvm-e2e
+subjects:
+- kind: ServiceAccount
+  name: lvm-e2e
+  namespace: lvm-e2e
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: lvme2eresults.lvme2e.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: lvme2e.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: lvme2eresults
+    # singular name to be used as an alias on the CLI and for display
+    singular: lvme2eresult
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: lvme2eResult
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - lvme2er
