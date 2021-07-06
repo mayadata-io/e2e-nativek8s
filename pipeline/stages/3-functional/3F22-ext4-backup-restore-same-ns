@@ -174,7 +174,7 @@ cp experiments/functional/backup_and_restore/run_e2e_test.yml ext4_restore_same_
 # Modify test specific values in runner file using sed command
 sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: ext4-restore-same-ns-/g' \
 -e 's/test: velero-backup-restore/test: ext4-restore-same-ns/g' \
--e 's/name: zfspv-backup-store/test: configmap-ext4-backup-restore-same-ns/g' \
+-e 's/name: zfspv-backup-store/name: configmap-ext4-backup-restore-same-ns/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: ext4-bkp-same-ns/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
@@ -201,7 +201,7 @@ sed -i '/parameters.yml: |/a \
 cat ext4_backup_same_ns.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../../pipeline/utils/e2e_job_runner label='app:ext4-restore-same-ns' job=ext4_restore_same_ns.yml
+bash ../../pipeline/utils/e2e_job_runner label='test:ext4-restore-same-ns' job=ext4_restore_same_ns.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
