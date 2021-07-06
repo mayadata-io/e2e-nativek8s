@@ -36,6 +36,7 @@ bash pipeline/utils/zfs-e2e-cr jobname:zfs-volume-resize-xfs jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-property-modify-zfs jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-property-modify-ext4 jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-property-modify-xfs jobphase:Waiting
+bash pipeline/utils/zfs-e2e-cr jobname:zfspv-property-modify-btrfs jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-snapshot-clone-zfs-create jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-snapshot-clone-ext4-create jobphase:Waiting
 bash pipeline/utils/zfs-e2e-cr jobname:zfspv-snapshot-clone-xfs-create jobphase:Waiting

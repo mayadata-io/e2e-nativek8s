@@ -36,7 +36,7 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-pv
 echo $test_name
 
 ## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd xfs-localpv/e2e-tests
+cd zfs-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_clone_from_pvc_xfs.yml
 
 # Modify test specific values in runner file using sed command
@@ -71,7 +71,7 @@ app_loadgen() {
 ## Generate test name for running litmusbook for generate load on application
 test_name=$(bash pipeline/utils/generate_test_name testcase=percona-loadgen-pvc-clone-xfs metadata='')
 echo $test_name
-cd xfs-localpv/e2e-tests
+cd zfs-localpv/e2e-tests
 
 # copy the content of workload run_e2e_test.yml into a different file to update the test specific parameters.
 cp apps/percona/workload/run_e2e_test.yml loadgen_clone_from_pvc_xfs.yml
@@ -105,12 +105,12 @@ fi
 clone_from_pvc_xfs() {
 
 ## Generate the test name for running the litmusbook for percona deployment
-run_id="xfs";test_name=$(bash pipeline/utils/generate_test_name testcase=zfs-clone-from-pvc metadata=${run_id})
+run_id="xfs";test_name=$(bash pipeline/utils/generate_test_name testcase=zfspv-clone-from-pvc metadata=${run_id})
 echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd xfs-localpv/e2e-tests
-cp experiments/functional/zfs-clone-directly-from-pvc/run_e2e_test.yml clone_from_pvc_xfs.yml
+cd zfs-localpv/e2e-tests
+cp experiments/functional/zfspv-clone-directly-from-pvc/run_e2e_test.yml clone_from_pvc_xfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: pvc-clone-xfs/g}' \
@@ -120,9 +120,9 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: pvc-clone-xfs/g}' \
 -e '/name: CLONE_PVC_NAME/{n;s/.*/            value: clone-pvc-xfs/g}' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/g}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' \
--e 's/generateName: zfs-clone-from-pvc-/generateName: clone-from-pvc-xfs-/g' \
--e 's/name: zfs-clone-from-pvc/name: clone-from-pvc-xfs/g' \
--e 's/test: zfs-clone-from-pvc/test: clone-from-pvc-xfs/g' clone_from_pvc_xfs.yml
+-e 's/generateName: zfspv-clone-from-pvc-/generateName: clone-from-pvc-xfs-/g' \
+-e 's/name: zfspv-clone-from-pvc/name: clone-from-pvc-xfs/g' \
+-e 's/test: zfspv-clone-from-pvc/test: clone-from-pvc-xfs/g' clone_from_pvc_xfs.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -165,7 +165,7 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=percona-deprovision-
 echo $test_name
 
 ## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd xfs-localpv/e2e-tests
+cd zfs-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_dep_clone_from_pvc_xfs.yml
 
 # Modify test specific values in runner file using sed command
