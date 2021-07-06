@@ -84,14 +84,14 @@ cd zfs-localpv/e2e-tests
 cp apps/percona/workload/run_e2e_test.yml loadgen_zfs_docker.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e 's/loadgen: percona-loadjob/loadgen: loadjob-zfs-docker/g' \
--e 's/generateName: percona-loadgen-/generateName: loadgen-zfs-docker-restart-/g' \
--e 's/value: app-percona-ns/value: zfs-docker/g' loadgen_zfs_docker.yml
+sed -i -e 's/loadgen: percona-loadjob/loadgen: percona-loadjob-zfs-docker/g' \
+-e 's/generateName: percona-loadgen-/generateName: percona-loadgen-zfs-docker-/g' \
+-e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'zfs-docker'/g}" loadgen_zfs_docker.yml
 
 cat loadgen_zfs_docker.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../../pipeline/utils/e2e_job_runner label='loadgen:loadjob-zfs-docker' job=loadgen_zfs_docker.yml
+bash ../../pipeline/utils/e2e_job_runner label='loadgen:percona-loadjob-zfs-docker' job=loadgen_zfs_docker.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
