@@ -122,7 +122,7 @@ cp experiments/functional/csi-volume-resize/run_e2e_test.yml csi_vol_resize_xfs.
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
--e 's/test: csi-voume-resize/test: csi-volume-resize-xfs/g' \
+-e 's/test: csi-volume-resize/test: csi-volume-resize-xfs/g' \
 -e 's/generateName: csi-volume-resize-/generateName: csi-volume-resize-xfs/g' \
 -e '/name: NEW_PV_CAPACITY/{n;s/.*/            value: 10Gi/g}' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: vol-resize-xfs/g}' csi_vol_resize_xfs.yml

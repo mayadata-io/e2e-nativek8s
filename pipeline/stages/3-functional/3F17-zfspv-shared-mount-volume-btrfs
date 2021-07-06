@@ -193,7 +193,7 @@ sed -i -e 's/generateName: zfspv-clone-/generateName: zfspv-clone-shared-btrfs-d
 -e '/labels:/{n;s/  test: zfspv-clone/  test: zfspv-clone-shared-btrfs-deprovision/g}' \
 -e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
--e '/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfspv-shared/}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
 -e '/name: CLONE_PVC_NAME/{n;s/.*/            value: clone-shared-pvc/}' \
@@ -242,7 +242,7 @@ sed -i -e 's/generateName: zfspv-snapshot-/generateName: zfspv-snapshot-shared-b
 -e '/labels:/{n;s/  test: zfspv-snapshot/  test: zfspv-snapshot-shared-btrfs-deprovision/g}' \
 -e 's/name: zfspv-snapshot-clone/name: snap-clone-shared-btrfs/g' \
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: shared-btrfs/}' \
--e '/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: SNAPSHOT_CLASS/{n;s/.*/            value: btrfs-snapshot-class/}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: shared-mount-snapshot-btrfs/}' \
 -e '/name: APP_PVC/{n;s/.*/            value: shared-pvc-btrfs/}' \

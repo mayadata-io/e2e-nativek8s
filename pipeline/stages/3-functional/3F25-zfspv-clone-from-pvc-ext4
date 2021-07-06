@@ -7,7 +7,7 @@ clone_from_pvc_ext4_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F25-zfs-clone-from-pvc-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F25-zfspv-clone-from-pvc-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
 
 }
 
@@ -169,7 +169,7 @@ cd ext4-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_dep_clone_from_pvc_ext4.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: pvc-clone-ext4'/g}" \
+sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'pvc-clone-ext4'/g}" \
 -e 's/app: percona-deployment/app: percona-deprovision-pvc-clone-ext4/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deprovision-pvc-clone-ext4-/g' \
 -e "s/value: 'provision'/value: 'deprovision'/g" percona_dep_clone_from_pvc_ext4.yml

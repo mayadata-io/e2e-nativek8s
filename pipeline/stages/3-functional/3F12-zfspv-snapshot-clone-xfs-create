@@ -179,7 +179,7 @@ sed -i -e 's/generateName: zfspv-clone-/generateName: clone-zfspv-xfs/g' \
 -e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: STORAGE_CLASS/{n;s/.*/            value: zfspv-sc-xfs/}' \
 -e '/name: SNAPSHOT_NAME/{n;s/.*/            value: xfs-snapshot/}' \
--e '/name: CLONED_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
+-e '/name: CLONE_PVC_NAME/{n;s/.*/            value: clone-pvc/}' \
 -e '/name: APP_NAME/{n;s/.*/            value: percona/}' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' clone_xfs.yml
 
@@ -191,7 +191,7 @@ sed -i '/command:/i \
 cat clone_xfs.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../../pipeline/utils/e2e_job_runner label='name:clone-zfspv-xfs' job=clone_xfs.yml
+bash ../../pipeline/utils/e2e_job_runner label='test:clone-zfspv-xfs' job=clone_xfs.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
