@@ -113,7 +113,7 @@ echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd zfs-localpv/e2e-tests
-cp experiments/chaos/kubernetes/service_failure/run_e2e_test.yml run_zfs_kubelet_restart.yml
+cp experiments/infra-chaos/service_failure/run_e2e_test.yml run_zfs_kubelet_restart.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/g}' \
