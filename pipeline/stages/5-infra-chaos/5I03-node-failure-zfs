@@ -113,7 +113,7 @@ echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd zfs-localpv/e2e-tests
-cp experiments/chaos/node_failure/run_e2e_test.yml run_node_failure_zfs.yml
+cp experiments/infra-chaos/node_failure/run_e2e_test.yml run_node_failure_zfs.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: node-zfs/g}' \
