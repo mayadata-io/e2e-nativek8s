@@ -5,7 +5,7 @@ echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
 sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $zfs_user@$zfs_ip -p $zfs_port 'git clone https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'cd e2e-nativek8s && git checkout test-zfslocalpv && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'cd e2e-nativek8s && git checkout release-branch && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
 cleanup_cluster() {
