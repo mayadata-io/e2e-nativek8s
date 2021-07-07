@@ -119,12 +119,12 @@ cp experiments/infra-chaos/node_failure/run_e2e_test.yml run_node_failure_zfs.ym
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: node-zfs/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
--e '/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: openebs/g}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/g}" \
 -e '/name: USERNAME/{n;s/.*/            value: k8s/g}' \
 -e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' \
 -e 's/generateName: node-failure-/generateName: node-failure-zfs-/g' \
 -e 's/test: node-failure/test: node-failure-zfs/g' \
--e 's/password:/password: VGVzdEAxMjM=/g' \
+-e 's/password:/password: cGFzc3dvcmQ=/g' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' \
 -e 's/passwordNode:/passwordNode: VGVzdEAxMjM=/g' run_node_failure_zfs.yml
 

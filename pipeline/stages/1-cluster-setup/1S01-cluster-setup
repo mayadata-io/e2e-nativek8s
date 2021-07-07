@@ -36,7 +36,7 @@ sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port kubectl get pods --all-namespaces
 
 echo "***Cloning e2e-nativek8s repo***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'git clone -b test-zfslocalpv https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'git clone -b release-branch https://github.com/mayadata-io/e2e-nativek8s.git'
 sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'cd e2e-nativek8s && git clone https://github.com/openebs/zfs-localpv.git'
 
 echo "***Applying the e2e-CRD's yaml***"
@@ -55,7 +55,7 @@ else
 echo "All nodes are not ready"
 echo "***Cluster is in Unhealthy state***"
 echo "***cloning e2e-nativek8s repo***"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'git clone -b test-zfslocalpv https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'git clone -b release-branch https://github.com/mayadata-io/e2e-nativek8s.git'
 #sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port 'python3 e2e-nativek8s/openebs-nativek8s/utils/result/result_update.py '"'$CI_JOB_ID'"' 1S01 1-cluster-setup "Configure the cluster and get it ready" Fail '"'$CI_PIPELINE_ID'"' '"'$current_time'"' '"'$CI_COMMIT_SHA'"' '"'$gittoken'"''
 exit 1;
 fi
