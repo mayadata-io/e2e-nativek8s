@@ -126,6 +126,7 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: node-zfs/g}' \
 -e 's/test: node-failure/test: node-failure-zfs/g' \
 -e 's/password:/password: cGFzc3dvcmQ=/g' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' \
+-e 's/name: node-password/name: infra-chaos-node-password/g' \
 -e 's/passwordNode:/passwordNode: VGVzdEAxMjM=/g' run_node_failure_zfs.yml
 
 sed -i -e "s|#nodeSelector|nodeSelector|g" \
