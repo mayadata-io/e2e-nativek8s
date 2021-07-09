@@ -28,7 +28,7 @@ bash pipeline/utils/lvm-e2e-cr jobname:upgrade-lvm-localpv jobphase:Waiting
 bash pipeline/utils/lvm-e2e-cr jobname:upgrade-lvm-localpv jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 ## Generate the test name for running the e2e-test for upgrade lvm-localpv
-test_name=$(bash pipeline/utils/generate_test_name testcase=lvm-localpv-upgrade metadata="")
+test_name=$(bash pipeline/utils/generate_test_name testcase=upgrade-lvm-localpv metadata="")
 echo $test_name
 
 # copy the content of upgrade run_e2e_test.yml into a temporary file to update the test specific parameters.
@@ -46,7 +46,7 @@ cat upgrade.yml
 bash ../../pipeline/utils/e2e_job_runner label='test:lvm-localpv-upgrade' job=upgrade.yml
 ## Get the cluster state Once the litmus jobs completed.
 bash ../../pipeline/utils/dump_cluster_state;
-cd ..
+cd ../..
 ## Update the e2e event for the job.
 bash pipeline/utils/event_updater jobname:upgrade-lvm-localpv $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
