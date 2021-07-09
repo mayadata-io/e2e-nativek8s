@@ -39,7 +39,7 @@ cd lvm-localpv/e2e-tests
 cp experiments/lvm-localpv-provisioner/run_e2e_test.yml lvmpv_provisioner.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e "/name: LVM_BRANCH/{n;s/value: master/value: ${lvm_branch}/g}" \
+sed -i -e "/name: LVM_BRANCH/{n;s/value: 'master'/value: ${lvm_branch}/g}" \
 -e "/name: LVM_DRIVER_IMAGE/{n;s/.*/            value: ${lvm_driver_image}/g}" \
 -e "/name: OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" \
 -e '/name: VOLUME_GROUP_CREATION/{n;s/.*/            value: "true"/g}' \
