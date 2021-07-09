@@ -118,7 +118,7 @@ CLEANUP-CLUSTER:
     when: always
     image: openebs/openshift-ci:latest
     dependencies:
-      - LVM-LocalPV-PROVISIONER
+      - LVM-LOCALPV-PROVISIONER
     stage: CLUSTER-CLEANUP
     script:
       - chmod 755 ./pipeline/stages/6-cleanup/cluster-cleanup/cluster-cleanup
