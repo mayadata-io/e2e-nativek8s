@@ -134,7 +134,7 @@ sed -i -e "s|#nodeSelector|nodeSelector|g" \
 
 sed -i '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' run_node_failure_zfs.yml
 
-sed -i '/name: ESX_HOST_IP/{n;s/.*/            value: 10.44.1.1/}' run_node_failure_zfs.yml
+sed -i '/name: ESX_HOST_IP/{n;s/.*/            value: 10.57.1.1/}' run_node_failure_zfs.yml
 
 sed -i '/parameters.yml: |/a \
     dbuser: root\
