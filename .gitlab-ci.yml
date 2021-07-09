@@ -75,7 +75,7 @@ APP-LVM-VOL-RESIZE-XFS:
 
 UPGRADE-LVM-LOCALPV:
     image: openebs/openshift-ci:latest
-    stage: UPGRADE-LVMLOCALPV
+    stage: UPGRADE-LVM-LOCALPV
     tags:
         - k8s-native
     dependencies:
