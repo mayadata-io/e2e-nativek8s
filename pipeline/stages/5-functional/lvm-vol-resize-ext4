@@ -30,24 +30,29 @@ echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
 cd lvm-localpv/e2e-tests
-cp experiments/chaos/app_pod_failure/run_e2e_test.yml appkill.yml
+cp experiments/chaos/app_pod_failure/run_e2e_test.yml appkill_ext4.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: lvm-resize-ext4/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
--e 's/test: application-pod-failure/test: application-pod-failure/g' \
--e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' appkill.yml
+-e 's/test: application-pod-failure/test: application-pod-failure-ext4/g' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' appkill_ext4.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' appkill_ext4.yml
 
 ## Insert the set of variables for percona data consistency util into configmap spec.
 sed -i '/parameters.yml: |/a \
     dbuser: root\
     dbpassword: k8sDem0\
     dbname: appkill
-' appkill.yml
+' appkill_ext4.yml
 
-cat appkill.yml
+cat appkill_ext4.yml
 
-bash ../../pipeline/utils/e2e_job_runner label='test:application-pod-failure' job=appkill.yml
+bash ../../pipeline/utils/e2e_job_runner label='test:application-pod-failure-ext4' job=appkill_ext4.yml
 cd ../..
 # Get the cluster state once the e2e-test jobs completed.
 bash pipeline/utils/dump_cluster_state;
@@ -137,7 +142,7 @@ bash pipeline/utils/event_updater jobname:lvm-vol-resize-ext4 $test_name jobid:"
 
 app_deprovision_rc_val=$(echo $?)
 
-if [ "$app_deprovision_rc_val" -eq "0" ] 
+if [ "$app_deprovision_rc_val" -eq "0" ]; then
 
 ## Update the e2e-result-custom-resources for the job
 bash pipeline/utils/lvm-e2e-cr jobname:lvm-vol-resize-ext4 jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
