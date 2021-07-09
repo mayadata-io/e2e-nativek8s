@@ -32,7 +32,7 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=lvm-localpv-upgrade 
 echo $test_name
 
 # copy the content of upgrade run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd e2e-tests
+cd lvm-localpv/e2e-tests
 cp experiments/upgrade-lvm-localpv/run_e2e_test.yml upgrade.yml
 
 # Modify test specific values in runner file using sed command
@@ -43,9 +43,9 @@ sed -i -e "/name: TO_VERSION_LVM_BRANCH/{n;s/.*/            value: ${to_version_
 cat upgrade.yml
 
 ## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
-bash ../openebs-nativek8s/utils/litmus_job_runner label='test:lvm-localpv-upgrade' job=upgrade.yml
+bash ../../pipeline/utils/e2e_job_runner label='test:lvm-localpv-upgrade' job=upgrade.yml
 ## Get the cluster state Once the litmus jobs completed.
-bash ../openebs-nativek8s/utils/dump_cluster_state;
+bash ../../pipeline/utils/dump_cluster_state;
 cd ..
 ## Update the e2e event for the job.
 bash pipeline/utils/event_updater jobname:upgrade-lvm-localpv $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
