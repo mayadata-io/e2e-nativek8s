@@ -1,6 +1,6 @@
 ---
-apiVersion: lvme2e.io/v1alpha1
-kind: lvme2eResult
+apiVersion: devicee2e.io/v1alpha1
+kind: devicee2eResult
 metadata:
   # name of the e2e testcase
   name: <test-name>
