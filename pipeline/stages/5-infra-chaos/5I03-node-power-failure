@@ -1,15 +1,15 @@
 #!/bin/bash
 
-node_name=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
+node_name=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-infra-chaos/5I03-node-power-failure run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"' '"'$LVM_ESX_IP'"' '"'$LVM_ESX_PASSWORD'"' '"'$LVM_NODE_PASSWORD'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-infra-chaos/5I03-node-power-failure run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"' '"'$DEVICE_ESX_IP'"' '"'$DEVICE_ESX_PASSWORD'"' '"'$DEVICE_NODE_PASSWORD'"'
 
 }
 
 #######################################
-# Deploy percona application on LVMPV #
+# Deploy percona application on devicePV #
 #######################################
 
 app_deploy() {
@@ -18,29 +18,29 @@ job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 observer_node=$(echo $4)
-lvm_esx_ip=$(echo $5)
-lvm_esx_pwd=$(echo $6)
-lvm_node_pwd=$(echo $7)
+device_esx_ip=$(echo $5)
+device_esx_pwd=$(echo $6)
+device_node_pwd=$(echo $7)
 
 time="date"
 current_time=$(eval $time)
 
 ## Pooling over the previous job to wait for its completion
 bash pipeline/utils/pooling jobname:node-kubelet-restart
-bash pipeline/utils/lvm-e2e-cr jobname:node-power-failure jobphase:Running init_time:"$current_time" jobid:"$job_id"
+bash pipeline/utils/device-e2e-cr jobname:node-power-failure jobphase:Running init_time:"$current_time" jobid:"$job_id"
 
 ## Generate the test name for running the e2e-test for percona deployment
 test_name=$(bash pipeline/utils/generate_test_name testcase=percona-provision-node-power-failure metadata="")
 echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd lvm-localpv/e2e-tests
+cd device-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_node_power_failure.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-node-power-failure/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deploy-node-power-failure-/g' \
--e "s/value: 'openebs-lvmsc'/value: 'openebs-lvmsc-wfc'/g" \
+-e "s/value: 'device-sc-ext4'/value: 'device-sc-ext4-wfc'/g" \
 -e "s/value: 'percona'/value: 'node-power-failure'/g" percona_node_power_failure.yml
 
 cat percona_node_power_failure.yml
@@ -71,7 +71,7 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=percona-loadgen-node
 echo $test_name
 
 ## copy the content of workload run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd lvm-localpv/e2e-tests
+cd device-localpv/e2e-tests
 cp apps/percona/workload/run_e2e_test.yml loadgen_node_power_failure.yml
 
 # Modify test specific values in runner file using sed command
@@ -107,17 +107,17 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=node-power-failure m
 echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd lvm-localpv/e2e-tests
+cd device-localpv/e2e-tests
 cp experiments/infra-chaos/node_power_failure/run_e2e_test.yml node_power_failure.yml
 
 # Modify test specific values in runner file using sed command
 sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: node-power-failure/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
--e "/name: ESX_HOST_IP/{n;s/.*/            value: ${lvm_esx_ip}/g}" \
+-e "/name: ESX_HOST_IP/{n;s/.*/            value: ${device_esx_ip}/g}" \
 -e '/name: USERNAME/{n;s/.*/            value: k8s/g}' \
--e "s/hostPassword:/hostPassword: ${lvm_esx_pwd}/g" \
--e "s/nodePassword:/nodePassword: ${lvm_node_pwd}/g" \
+-e "s/hostPassword:/hostPassword: ${device_esx_pwd}/g" \
+-e "s/nodePassword:/nodePassword: ${device_node_pwd}/g" \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' node_power_failure.yml
 
 sed -i -e "s|#nodeSelector|nodeSelector|g" \
@@ -157,7 +157,7 @@ test_name=$(bash pipeline/utils/generate_test_name testcase=percona-deprovision-
 echo $test_name
 
 ## copy the content of run_e2e_test.yml into a temporary file to update the test specific parameters.
-cd lvm-localpv/e2e-tests
+cd device-localpv/e2e-tests
 cp apps/percona/deployers/run_e2e_test.yml percona_dep_node_power_failure.yml
 
 # Modify test specific values in runner file using sed command
@@ -180,12 +180,12 @@ app_deprovision_rc_val=$(echo $?)
 
 if [ "$app_deprovision_rc_val" != "0" ]; then
 
-bash pipeline/utils/lvm-e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+bash pipeline/utils/device-e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
 exit 1;
 
 fi
 
-bash pipeline/utils/lvm-e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+bash pipeline/utils/device-e2e-cr jobname:node-power-failure jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
 
 }
 

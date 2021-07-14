@@ -4,8 +4,8 @@ connect_cluster() {
 echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
-sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $lvm_user@$ip -p $port 'git clone -b lvm-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port 'cd e2e-nativek8s && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+sshpass -p $pass ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $device_user@$device_ip -p $device_port 'git clone -b device-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port 'cd e2e-nativek8s && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
 cleanup_cluster() {
@@ -21,10 +21,10 @@ sed -i -e 's/10.12.22.10/10.57.1.220/g' \
 -e 's/10.12.22.13/10.57.1.223/g' k8s/on-prem/openshift-installer/ip.csv
 
 #Replace the Vm names in csv file
-sed -i -e 's/auto1/lvm-master/g' \
--e 's/auto2/lvm-node1/g' \
--e 's/auto3/lvm-node2/g' \
--e 's/auto4/lvm-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
+sed -i -e 's/auto1/device-master/g' \
+-e 's/auto2/device-node1/g' \
+-e 's/auto3/device-node2/g' \
+-e 's/auto4/device-node3/g' k8s/on-prem/openshift-installer/vm_name.csv
 
 #Replace the snapshot name and exp ip in vars
 sed -i -e 's/snapshot_name: "oc-cluster"/snapshot_name: "lvm"/g' \

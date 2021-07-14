@@ -31,17 +31,17 @@ stages:
   dependencies:
     - 1S01-KUBEADM-CLUSTER
 
-2P01-LVM-LOCALPV-PROVISIONER-DEPLOY:
+2P01-DEVICE-LOCALPV-PROVISIONER-DEPLOY:
   extends: .provisioner_test_template
   script:
-    - chmod 755 ./pipeline/stages/2-provisioner/2P01-lvm-localpv-provisioner
-    - ./pipeline/stages/2-provisioner/2P01-lvm-localpv-provisioner
+    - chmod 755 ./pipeline/stages/2-provisioner/2P01-device-localpv-provisioner
+    - ./pipeline/stages/2-provisioner/2P01-device-localpv-provisioner
 
-2P02-LVM-LOCALPV-CONTROLLER-HA:
+2P02-DEVICE-LOCALPV-CONTROLLER-HA:
   extends: .provisioner_test_template
   script:
-    - chmod 755 ./pipeline/stages/2-provisioner/2P02-lvm-controller-high-availability
-    - ./pipeline/stages/2-provisioner/2P02-lvm-controller-high-availability
+    - chmod 755 ./pipeline/stages/2-provisioner/2P02-device-controller-high-availability
+    - ./pipeline/stages/2-provisioner/2P02-device-controller-high-availability
     
 ##################################
 
@@ -52,67 +52,13 @@ stages:
     - k8s-native
   when: always
   dependencies:
-    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+    - 2P01-DEVICE-LOCALPV-PROVISIONER-DEPLOY
 
-3F01-LVM-VOLUME-RESIZE-EXT4:
+3F01-DEVICEPV-CUSTOM-TOPOLOGY:
   extends: .func1_test_template
   script:
-    - chmod 755 ./pipeline/stages/3-functional/3F01-lvm-volume-resize
-    - ./pipeline/stages/3-functional/3F01-lvm-volume-resize
-
-3F02-LVMPV-VOLUME-RESIZE-XFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F02-lvm-volume-resize-xfs
-    - ./pipeline/stages/3-functional/3F02-lvm-volume-resize-xfs
-
-3F03-LVMPV-VOLUME-RESIZE-BTRFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F03-lvm-volume-resize-btrfs
-    - ./pipeline/stages/3-functional/3F03-lvm-volume-resize-btrfs
-
-3F04-LVMPV-CUSTOM-TOPOLOGY:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F04-lvmpv-custom-topology
-    - ./pipeline/stages/3-functional/3F04-lvmpv-custom-topology
-
-3F05-LVMPV-SHARED-MOUNT-EXT4:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F05-lvmpv-shared-mount-volume-ext4
-    - ./pipeline/stages/3-functional/3F05-lvmpv-shared-mount-volume-ext4
-
-3F06-LVMPV-SHARED-MOUNT-XFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F06-lvmpv-shared-mount-volume-xfs
-    - ./pipeline/stages/3-functional/3F06-lvmpv-shared-mount-volume-xfs
-
-3F07-LVMPV-SHARED-MOUNT-BTRFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F07-lvmpv-shared-mount-volume-btrfs
-    - ./pipeline/stages/3-functional/3F07-lvmpv-shared-mount-volume-btrfs
-
-3F08-LVMPV-SNAPSHOT-EXT4:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F08-lvmpv-snapshot-ext4
-    - ./pipeline/stages/3-functional/3F08-lvmpv-snapshot-ext4
-
-3F09-LVMPV-SNAPSHOT-XFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F09-lvmpv-snapshot-xfs
-    - ./pipeline/stages/3-functional/3F09-lvmpv-snapshot-xfs
-
-3F10-LVMPV-SNAPSHOT-BTRFS:
-  extends: .func1_test_template
-  script:
-    - chmod 755 ./pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs
-    - ./pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs
+    - chmod 755 ./pipeline/stages/3-functional/3F01-devicepv-custom-topology
+    - ./pipeline/stages/3-functional/3F01-devicepv-custom-topology
 
 ##################################
 
@@ -123,13 +69,19 @@ stages:
     - k8s-native
   when: always
   dependencies:
-    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+    - 2P01-DEVICE-LOCALPV-PROVISIONER-DEPLOY
 
-4C01-APP-POD-FAILURE:
+4C01-APP-KILL-EXT4:
   extends: .chaos_template
   script:
-    - chmod 755 ./pipeline/stages/4-chaos/4C01-application-pod-failure
-    - ./pipeline/stages/4-chaos/4C01-application-pod-failure
+    - chmod 755 ./pipeline/stages/4-chaos/4C01-application-pod-failure-ext4
+    - ./pipeline/stages/4-chaos/4C01-application-pod-failure-ext4
+
+4C02-APP-KILL-XFS:
+  extends: .chaos_template
+  script:
+    - chmod 755 ./pipeline/stages/4-chaos/4C01-application-pod-failure-xfs
+    - ./pipeline/stages/4-chaos/4C01-application-pod-failure-xfs
 
 ##################################
 
@@ -140,7 +92,7 @@ stages:
     - k8s-native
   when: always
   dependencies:
-    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+    - 2P01-DEVICE-LOCALPV-PROVISIONER-DEPLOY
 
 5I01-NODE-DOCKER-RESTART:
   extends: .infra_chaos_template
@@ -169,7 +121,7 @@ stages:
   tags:
     - k8s-native
   dependencies:
-    - 2P01-LVM-LOCALPV-PROVISIONER-DEPLOY
+    - 2P01-DEVICE-LOCALPV-PROVISIONER-DEPLOY
   script:
     - chmod 775 ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
     - ./pipeline/stages/6-cleanup/6D01-cluster-cleanup
