@@ -110,6 +110,11 @@ sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: app-kill-ext4/g}' \
 -e 's/name: app-pod-failure/name: app-pod-failure-ext4/g' \
 -e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/g}' appkill_ext4.yml
 
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' appkill_ext4.yml
+
 ## Insert the set of variables for percona data consistency util into configmap spec.
 sed -i '/parameters.yml: |/a \
     dbuser: root\
