@@ -105,7 +105,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:zfs-zv-property-runtime-mod
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-property-modify-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zv_property_modify_rc_val=$(echo $?)
 if [ "$zv_property_modify_rc_val" != "0" ]; then
@@ -142,7 +142,7 @@ cd ../..
 ## Get the cluster state Once the litmus jobs completed.
 bash pipeline/utils/dump_cluster_state;
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-property-modify-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
 

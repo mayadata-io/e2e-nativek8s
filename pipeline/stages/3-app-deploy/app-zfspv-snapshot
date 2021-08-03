@@ -46,7 +46,7 @@ bash ../../pipeline/utils/e2e_job_runner label='app:percona-deployment-zfs-snap'
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:app-zfspv-snapshot $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deploy_rc_val=$(echo $?)
 if [ "$app_deploy_rc_val" != "0" ]; then
@@ -82,7 +82,7 @@ bash ../../pipeline/utils/e2e_job_runner label='loadgen:percona-loadjob-zfs-snap
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:app-zfspv-snapshot $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_loadgen_rc_val=$(echo $?)
 if [ "$app_loadgen_rc_val" != "0" ]; then
@@ -128,7 +128,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:zfspv-snapshot' job=zfs_sna
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:app-zfspv-snapshot $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_rc_val" != "0" ]; then

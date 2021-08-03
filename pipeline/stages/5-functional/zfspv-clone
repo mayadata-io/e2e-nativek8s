@@ -55,7 +55,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:zfspv-clone' job=zfs_clone_
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_rc_val=$(echo $?)
 
@@ -104,7 +104,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:zfspv-clone-deprovision' jo
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_clone_deprovision_rc_val" != "0" ]; then
@@ -152,7 +152,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:zfspv-snapshot-deprovision'
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_deprovision_rc_val" != "0" ]; then
@@ -189,7 +189,7 @@ bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-zfs-snap
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-zfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:zfspv-clone $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_rc_val=$(echo $?)
 

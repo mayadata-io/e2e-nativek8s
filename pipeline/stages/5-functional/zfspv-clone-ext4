@@ -63,7 +63,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:clone-zfspv-ext4' job=clone
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-ext4-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_ext4_rc_val=$(echo $?)
 if [ "$zfspv_clone_ext4_rc_val" != "0" ]; then
@@ -112,7 +112,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:clone-ext4-deprovision' job
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-ext4-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_ext4_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_clone_ext4_deprovision_rc_val" != "0" ]; then
@@ -161,7 +161,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:snap-ext4-deprovision' job=
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-ext4-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_ext4_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_ext4_deprovision_rc_val" != "0" ]; then
@@ -198,7 +198,7 @@ bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-ext4-sna
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-ext4-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-ext4 $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 app_deprovision_ext4_rc_val=$(echo $?)
 
 if [ "$app_deprovision_ext4_rc_val" -eq "0" ] &&
