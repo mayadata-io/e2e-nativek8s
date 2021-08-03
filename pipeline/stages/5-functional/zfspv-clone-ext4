@@ -7,7 +7,7 @@ zfspv_snapshot_ext4_deprovision_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-functional/zfspv-clone-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-functional/zfspv-clone-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
 
 }
 
@@ -20,8 +20,7 @@ zfspv_clone_ext4() {
 job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
-zfs_operator_namespace=$(echo $4)
-ource ~/.profile
+source ~/.profile
 
 time="date"
 current_time=$(eval $time)

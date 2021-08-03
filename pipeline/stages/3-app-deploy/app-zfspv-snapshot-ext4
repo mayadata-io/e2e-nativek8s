@@ -158,7 +158,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  app_deploy_ext4 $2 $3 $4 $5
+  app_deploy_ext4 $2 $3 $4
   app_loadgen_ext4
   zfspv_snapshot_ext4
 

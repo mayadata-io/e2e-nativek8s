@@ -2,7 +2,7 @@
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/2-zfs-localpv-provisioner/zfs-controller-high-availability run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && pipeline/stages/2-zfs-localpv-provisioner/zfs-controller-high-availability run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
 
 }
 
