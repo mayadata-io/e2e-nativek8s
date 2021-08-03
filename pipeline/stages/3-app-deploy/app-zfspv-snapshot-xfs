@@ -158,7 +158,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  app_deploy_xfs $2 $3 $4
+  app_deploy_xfs $2 $3 $4 $5
   app_loadgen_xfs
   zfspv_snapshot_xfs
 
