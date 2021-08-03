@@ -6,7 +6,7 @@ zv_properties_verify_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-functional/zfs-vol-resize-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-functional/zfs-vol-resize-ext4 run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
 
 }
 
@@ -19,6 +19,7 @@ zv_properties_verify() {
 job_id=$(echo $1)
 pipeline_id=$(echo $2)
 commit_id=$(echo $3)
+zfs_operator_namespace=$(echo $4)
 source ~/.profile
 
 time="date"
@@ -158,7 +159,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  zv_properties_verify $2 $3 $4
+  zv_properties_verify $2 $3 $4 $5
   csi_vol_resize
   app_deprovision
 else
