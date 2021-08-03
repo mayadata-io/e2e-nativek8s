@@ -32,7 +32,7 @@ cd zfs-localpv/e2e-tests
 # copy the content of deployer run_e2e_test.yml into a different file to update the test specific parameters.
 cp experiments/chaos/app_pod_failure/run_e2e_test.yml appkill_ext4.yml
 
-sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs-modify/}' \
+sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: ext4-property-modify/}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/}' \
 -e 's/generateName: application-pod-failure-/generateName: ext4-application-pod-failure-/g' \
 -e 's/name: application-pod-failure/name: application-pod-failure-ext4/g' \
@@ -61,7 +61,7 @@ bash pipeline/utils/event_updater jobname:zv-property-modify-ext4 $test_name job
 
 app_pod_kill_ext4_rc_val=$(echo $?)
 if [ "$app_pod_kill_ext4_rc_val" != "0" ]; then
-zv_property_modify
+exit 1;
 fi
 
 }
