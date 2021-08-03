@@ -63,7 +63,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:clone-zfspv-xfs' job=clone_
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-xfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_xfs_rc_val=$(echo $?)
 if [ "$zfspv_clone_xfs_rc_val" != "0" ]; then
@@ -112,7 +112,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:clone-xfs-deprovision' job=
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-xfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_clone_xfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_clone_xfs_deprovision_rc_val" != "0" ]; then
@@ -161,7 +161,7 @@ bash ../../pipeline/utils/e2e_job_runner label='test:snap-xfs-deprovision' job=s
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-xfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 zfspv_snapshot_xfs_deprovision_rc_val=$(echo $?)
 if [ "$zfspv_snapshot_xfs_deprovision_rc_val" != "0" ]; then
@@ -198,7 +198,7 @@ bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-xfs-snap
 bash ../../pipeline/utils/dump_cluster_state;
 cd ../..
 ## Update the e2e event for the job.
-bash pipeline/utils/event_updater jobname:zfspv-snapshot-clone-xfs-create $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+bash pipeline/utils/event_updater jobname:clone-xfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
 
 app_deprovision_xfs_rc_val=$(echo $?)
 
