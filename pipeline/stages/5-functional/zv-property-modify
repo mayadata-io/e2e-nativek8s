@@ -1,0 +1,169 @@
+#!/bin/bash
+
+## Define and initialize test-result specific variables.
+app_pod_kill_zfs_rc_val=1
+zv_property_modify_rc_val=1
+
+## SSH into the cluster to run the kubernetes jobs for the experiments
+connect_cluster() {
+sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-functional/zv-property-modify run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"'
+
+}
+
+app_pod_kill_zfs(){
+
+job_id=$(echo $1)
+pipeline_id=$(echo $2)
+commit_id=$(echo $3)
+source ~/.profile
+
+time="date"
+current_time=$(eval $time)
+
+## Create the e2e-result-custom-resources for the jobs
+bash pipeline/utils/zfs-e2e-cr jobname:zv-property-modify jobphase:Waiting
+bash pipeline/utils/zfs-e2e-cr jobname:zv-property-modify jobphase:Running init_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+run_id="zfs";test_name=$(bash pipeline/utils/generate_test_name testcase=application-pod-failure metadata=${run_id})
+echo $test_name
+
+cd zfs-localpv/e2e-tests
+# copy the content of deployer run_e2e_test.yml into a different file to update the test specific parameters.
+cp experiments/chaos/app_pod_failure/run_e2e_test.yml appkill_zfs.yml
+
+sed -i -e '/name: APP_NAMESPACE/{n;s/.*/            value: percona-zfs-modify/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: app=percona/}' \
+-e 's/generateName: application-pod-failure-/generateName: zfs-application-pod-failure-/g' \
+-e 's/name: application-pod-failure/name: application-pod-failure-zfs/g' \
+-e 's/name: app-pod-failure/name: app-pod-failure-zfs-configmap/g' \
+-e '/name: DATA_PERSISTENCE/{n;s/.*/            value: mysql/}' appkill_zfs.yml
+
+## Insert the set of variables for percona data consistency util into configmap spec.
+sed -i '/parameters.yml: |/a \
+    dbuser: root\
+    dbpassword: k8sDem0\
+    dbname: appkillzfs
+' appkill_zfs.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' appkill_zfs.yml
+
+cat appkill_zfs.yml
+
+bash ../../pipeline/utils/e2e_job_runner label='name:application-pod-failure-zfs' job=appkill_zfs.yml
+cd ../..
+# Get the cluster state Once the litmus jobs completed.
+bash pipeline/utils/dump_cluster_state;
+bash pipeline/utils/event_updater jobname:zv-property-modify $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_pod_kill_zfs_rc_val=$(echo $?)
+if [ "$app_pod_kill_zfs_rc_val" != "0" ]; then
+zv_property_modify
+fi
+
+}
+
+######################
+# ZV property modify #
+######################
+
+zv_property_modify() {
+
+## Generate the test name for running the litmusbook for percona deployment
+run_id="zfs";test_name=$(bash pipeline/utils/generate_test_name testcase=zv-property-runtime-modify metadata=${run_id})
+echo $test_name
+
+## copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd zfs-localpv/e2e-tests
+cp experiments/functional/zv-property-runtime-modify/run_e2e_test.yml zv_property_runtime_modify.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e 's/generateName: zv-property-runtime-modify-/generateName: zfs-zv-property-runtime-modify-/g' \
+-e 's/test: zv-property-runtime-modify/test: zfs-zv-property-runtime-modify/g' \
+-e '/name: APP_NAMESPACE/{n;s/.*/            value: zfs-property-modify/}' \
+-e '/name: APP_LABEL/{n;s/.*/            value: app=percona/}' \
+-e '/name: FILE_SYSTEM_TYPE/{n;s/.*/            value: zfs/}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
+-e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/}' \
+-e '/name: NEW_COMPRESSION_PARAMETER/{n;s/.*/            value: "on"/}' \
+-e '/name: NEW_DEDUP_PARAMETER/{n;s/.*/            value: "on"/}' \
+-e '/name: ZPOOL_NAME/{n;s/.*/            value: zfs-test-pool/}' zv_property_runtime_modify.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_id"'\
+' zv_property_runtime_modify.yml
+
+cat zv_property_runtime_modify.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='test:zfs-zv-property-runtime-modify' job=zv_property_runtime_modify.yml
+## Get the cluster state Once the litmus jobs completed.
+bash ../../pipeline/utils/dump_cluster_state;
+cd ../..
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-property-modify-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+zv_property_modify_rc_val=$(echo $?)
+if [ "$zv_property_modify_rc_val" != "0" ]; then
+exit 1;
+fi
+
+}
+
+#######################################
+#   Deprovision percona application   #
+#######################################
+
+app_deprovision() {
+
+## Generate test name for running litmusbook for generate load on application
+test_name=$(bash pipeline/utils/generate_test_name testcase=percona-deprovision-zfs-property-modify metadata='')
+echo $test_name
+
+# copy the content of workload run_e2e_test.yml into a temporary file to update the test specific parameters.
+cd zfs-localpv/e2e-tests
+cp apps/percona/deployers/run_e2e_test.yml percona_deprovision_zfs_property_modify.yml
+
+# Modify test specific values in runner file using sed command
+sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'zfs-property-modify'/g}" \
+-e 's/app: percona-deployment/app: percona-deprovision-zfs-property-modify/g' \
+-e 's/generateName: percona-deploy-/generateName: percona-deprovision-zfs-property-modify-/g' \
+-e "s/value: 'provision'/value: 'deprovision'/g" percona_deprovision_zfs_property_modify.yml
+
+cat percona_deprovision_zfs_property_modify.yml
+
+## Run the Litmus job and get the details of the litmus job from litmus_job_runner utils.
+bash ../../pipeline/utils/e2e_job_runner label='app:percona-deprovision-zfs-property-modify' job=percona_deprovision_zfs_property_modify.yml
+cd ../..
+## Get the cluster state Once the litmus jobs completed.
+bash pipeline/utils/dump_cluster_state;
+## Update the e2e event for the job.
+bash pipeline/utils/event_updater jobname:zfspv-property-modify-zfs $test_name jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id"
+
+app_deprovision_rc_val=$(echo $?)
+
+if [ "$app_deprovision_rc_val" -eq "0" ] &&
+   [ "$zv_property_modify_rc_val" -eq "0" ] &&
+   [ "$app_pod_kill_zfs_rc_val" -eq "0" ]; then
+
+## Update the e2e-result-custom-resources for the job
+bash pipeline/utils/zfs-e2e-cr jobname:zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Pass
+
+else
+## Update the e2e-result-custom-resources for the job
+bash pipeline/utils/zfs-e2e-cr jobname:zv-property-modify jobphase:Completed end_time:"$current_time" jobid:"$job_id" pipelineid:"$pipeline_id" testcaseid:"$case_id" test_result:Fail
+exit 1;
+fi
+
+}
+
+if [ "$1" == "run_job" ];then
+  app_pod_kill_zfs $2 $3 $4
+  zv_property_modify
+  app_deprovision
+else
+  connect_cluster
+fi
