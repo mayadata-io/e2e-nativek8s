@@ -11,7 +11,7 @@ testcase_id=$(echo $6 | cut -d ":" -f 2)
 openebs_version=$(echo $8 | cut -d ":" -f 2)
 test_result=$(echo $7 | cut -d ":" -f2-)
 
-echo "******Creating lvm-e2e-result-custom-resource********"
+echo "******Creating device-e2e-result-custom-resource********"
 
 if [[ "${time_phase}" == "init_time" ]];then
   sed -i -e "s/<test-init>/$test_time/g" result-$job_name.yml;
@@ -23,7 +23,7 @@ fi
 
 # Update the job phase in resutl yaml
 if [[ "${job_phase}" == "Waiting" ]];then
-  cat pipeline/utils/lvm-e2e-result.yml > result-$job_name.yml
+  cat pipeline/utils/device-e2e-result.yml > result-$job_name.yml
   sed -i -e "s/<test-phase>/$job_phase/g" result-$job_name.yml
 elif [[ "${job_phase}" == "Running" ]];then
   sed -i -e "s/Waiting/$job_phase/g" result-$job_name.yml
