@@ -80,8 +80,8 @@ stages:
 4C02-APP-KILL-XFS:
   extends: .chaos_template
   script:
-    - chmod 755 ./pipeline/stages/4-chaos/4C01-application-pod-failure-xfs
-    - ./pipeline/stages/4-chaos/4C01-application-pod-failure-xfs
+    - chmod 755 ./pipeline/stages/4-chaos/4C02-application-pod-failure-xfs
+    - ./pipeline/stages/4-chaos/4C02-application-pod-failure-xfs
 
 ##################################
 
