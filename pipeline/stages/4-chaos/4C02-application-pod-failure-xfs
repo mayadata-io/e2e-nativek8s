@@ -34,7 +34,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_app_kill_xfs.yml
 # Modify test specific values in runner file using sed command
 sed -i -e 's/app: percona-deployment/app: percona-deployment-app-kill-xfs/g' \
 -e 's/generateName: percona-deploy-/generateName: percona-deploy-app-pod-failure-xfs-/g' \
--e "s/value: 'device-sc-ext4'/value: 'device-sc-xfs-wfc'/g" \
+-e "s/value: 'device-sc-ext4'/value: 'device-sc-xfs'/g" \
 -e "s/value: 'percona'/value: 'app-kill-xfs'/g" percona_app_kill_xfs.yml
 
 cat percona_app_kill_xfs.yml
