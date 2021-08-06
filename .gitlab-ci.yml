@@ -4,7 +4,7 @@ stages:
     - CLUSTER-SETUP
     - PROVIDER-INFRA-SETUP
     - APP-DEPLOY
-    - UPGRADE-LVM-LOCALPV
+    - UPGRADE-DEVICE-LOCALPV
     - FUNCTIONAL-TEST
     - CLUSTER-CLEANUP
 
@@ -21,7 +21,7 @@ KUBEADM-CLUSTER:
 
 #################################################################################
 
-LVM-LOCALPV-PROVISIONER:
+DEVICE-LOCALPV-PROVISIONER:
     image: openebs/openshift-ci:latest
     stage: PROVIDER-INFRA-SETUP
     dependencies:
@@ -29,10 +29,10 @@ LVM-LOCALPV-PROVISIONER:
     tags:
         - k8s-native
     script: 
-        - chmod 755 ./pipeline/stages/2-provisioner/lvm-localpv-provisioner
-        - ./pipeline/stages/2-provisioner/lvm-localpv-provisioner
+        - chmod 755 ./pipeline/stages/2-provisioner/device-localpv-provisioner
+        - ./pipeline/stages/2-provisioner/device-localpv-provisioner
 
-LVM-CONTROLLER-HA:
+DEVICE-CONTROLLER-HA:
     image: openebs/openshift-ci:latest
     stage: PROVIDER-INFRA-SETUP
     dependencies: 
@@ -40,8 +40,8 @@ LVM-CONTROLLER-HA:
     tags:
         - k8s-native
     script: 
-        - chmod 755 ./pipeline/stages/2-provisioner/lvm-controller-high-availability
-        - ./pipeline/stages/2-provisioner/lvm-controller-high-availability
+        - chmod 755 ./pipeline/stages/2-provisioner/device-controller-high-availability
+        - ./pipeline/stages/2-provisioner/device-controller-high-availability
 
 #################################################################################
 
@@ -51,38 +51,32 @@ LVM-CONTROLLER-HA:
     tags: 
         - k8s-native
     dependencies:
-        - LVM-LOCALPV-PROVISIONER
+        - DEVICE-LOCALPV-PROVISIONER
 
-APP-LVM-VOL-RESIZE-BTRFS:
+APP-DEPLOY-KILL-EXT4:
     extends: .app_deploy_template
     script:
-        - chmod 755 ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-btrfs
-        - ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-btrfs
+        - chmod 755 ./pipeline/stages/3-app-deploy/app-kill-ext4
+        - ./pipeline/stages/3-app-deploy/app-kill-ext4
 
-APP-LVM-VOL-RESIZE-EXT4:
+APP-DEPLOY-KILL-XFS:
     extends: .app_deploy_template
     script:
-        - chmod 755 ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-ext4
-        - ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-ext4
-
-APP-LVM-VOL-RESIZE-XFS:
-    extends: .app_deploy_template
-    script:
-        - chmod 755 ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-xfs
-        - ./pipeline/stages/3-app-deploy/app-lvm-vol-resize-xfs
+        - chmod 755 ./pipeline/stages/3-app-deploy/app-kill-xfs
+        - ./pipeline/stages/3-app-deploy/app-kill-xfs
 
 #################################################################################
 
-UPGRADE-LVM-LOCALPV:
+UPGRADE-DEVICE-LOCALPV:
     image: openebs/openshift-ci:latest
-    stage: UPGRADE-LVM-LOCALPV
+    stage: UPGRADE-DEVICE-LOCALPV
     tags:
         - k8s-native
     dependencies:
-        - LVM-LOCALPV-PROVISIONER
+        - DEVICE-LOCALPV-PROVISIONER
     script:
-        - chmod 755 ./pipeline/stages/4-upgrade/upgrade-lvm-localpv
-        - ./pipeline/stages/4-upgrade/upgrade-lvm-localpv
+        - chmod 755 ./pipeline/stages/4-upgrade/upgrade-device-localpv
+        - ./pipeline/stages/4-upgrade/upgrade-device-localpv
 
 #################################################################################
 
@@ -92,25 +86,19 @@ UPGRADE-LVM-LOCALPV:
     tags:
         - k8s-native
     dependencies:
-        - LVM-LOCALPV-PROVISIONER
+        - DEVICE-LOCALPV-PROVISIONER
 
-LVM-VOL-RESIZE-BTRFS:
+APP-KILL-EXT4:
     extends: .func_test_template
     script:
-        - chmod 755 ./pipeline/stages/5-functional/lvm-vol-resize-btrfs
-        - ./pipeline/stages/5-functional/lvm-vol-resize-btrfs
+        - chmod 755 ./pipeline/stages/5-functional/app-kill-ext4
+        - ./pipeline/stages/5-functional/app-kill-ext4
 
-LVM-VOL-RESIZE-EXT4:
+APP-KILL-XFS:
     extends: .func_test_template
     script:
-        - chmod 755 ./pipeline/stages/5-functional/lvm-vol-resize-ext4
-        - ./pipeline/stages/5-functional/lvm-vol-resize-ext4
-
-LVM-VOL-RESIZE-XFS:
-    extends: .func_test_template
-    script:
-        - chmod 755 ./pipeline/stages/5-functional/lvm-vol-resize-xfs
-        - ./pipeline/stages/5-functional/lvm-vol-resize-xfs
+        - chmod 755 ./pipeline/stages/5-functional/app-kill-xfs
+        - ./pipeline/stages/5-functional/app-kill-xfs
 
 #################################################################################
 
@@ -118,7 +106,7 @@ CLEANUP-CLUSTER:
     when: always
     image: openebs/openshift-ci:latest
     dependencies:
-      - LVM-LOCALPV-PROVISIONER
+      - DEVICE-LOCALPV-PROVISIONER
     stage: CLUSTER-CLEANUP
     script:
       - chmod 755 ./pipeline/stages/6-cleanup/cluster-cleanup/cluster-cleanup
