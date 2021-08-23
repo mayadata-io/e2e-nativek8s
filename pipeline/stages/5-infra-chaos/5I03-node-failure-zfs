@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### Taint the node to run infra chaos test scripts
-node_name=$(sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
+node_name=$(ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -i /root/.ssh/id_rsa -o LogLevel=ERROR kubectl get nodes --no-headers | grep -v master | awk 'FNR==1 {print $1}')
 
 ## Define and initialize test-result specific variables.
 app_deploy_rc_val=1
@@ -10,7 +10,11 @@ node_failure_zfs_rc_val=1
 
 ## SSH into the cluster to run the kubernetes jobs for the experiments
 connect_cluster() {
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-infra-chaos/5I03-node-failure-zfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
+mkdir -p /root/.ssh
+touch /root/.ssh/id_rsa
+echo "$SSH_KEYS" > /root/.ssh/id_rsa
+chmod 600 /root/.ssh/id_rsa
+ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/5-infra-chaos/5I03-node-failure-zfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$node_name'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
 
 }
 
