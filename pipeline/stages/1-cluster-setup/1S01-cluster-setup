@@ -13,6 +13,9 @@ chmod 600 /root/.ssh/id_rsa
 state="ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'ls | grep e2e-nativek8s'"
 cluster_state=$(eval $state)
 
+kubectl_version=$(ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa kubectl get nodes --no-headers -o custom-columns=:.status.nodeInfo.kubeletVersion | uniq | cut -d '+' -f 1)
+echo "k8s_version==$kubectl_version"
+
 while [ "${cluster_state}" == "e2e-nativek8s" ]; do
   echo "***cluster is Engaged******"
   wait=1
