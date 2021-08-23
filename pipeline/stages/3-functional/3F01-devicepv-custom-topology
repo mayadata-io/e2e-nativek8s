@@ -6,7 +6,7 @@ mkdir -p /root/.ssh
 touch /root/.ssh/id_rsa
 echo "$SSH_KEYS" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F01-devicepv-custom-topology run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$META_DEVICE_NAME'"'
+ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F01-devicepv-custom-topology run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$META_DEVICE_NAME'"'
 
 }
 

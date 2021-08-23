@@ -6,7 +6,7 @@ mkdir -p /root/.ssh
 touch /root/.ssh/id_rsa
 echo "$SSH_KEYS" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
-sshpass -p $pass ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/2-provisioner/2P01-device-localpv-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$DEVICE_BRANCH'"' '"'$DEVICE_DRIVER_IMAGE'"' '"'$PHYSICAL_DEVICE_DISKS'"' '"'$DEVICE_OPERATOR_NAMESPACE'"' '"'$META_PARTITION_CREATION'"' '"'$META_DEVICE_NAME'"' '"'$DEVICE_LOCALPV_NODES'"'
+ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/2-provisioner/2P01-device-localpv-provisioner run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$DEVICE_BRANCH'"' '"'$DEVICE_DRIVER_IMAGE'"' '"'$PHYSICAL_DEVICE_DISKS'"' '"'$DEVICE_OPERATOR_NAMESPACE'"' '"'$META_PARTITION_CREATION'"' '"'$META_DEVICE_NAME'"' '"'$DEVICE_LOCALPV_NODES'"'
 
 }
 
