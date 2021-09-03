@@ -13,7 +13,7 @@ mkdir -p /root/.ssh
 touch /root/.ssh/id_rsa
 echo "$SSH_KEYS" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
-ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F29-xfs-backup-restore-diff-node run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$VELERO_PLUGIN_NAME'"' '"'$VELERO_VERSION'"'
+ssh -o StrictHostKeyChecking=no $zfs_user@$zfs_ip -p $zfs_port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F29-xfs-backup-restore-diff-node run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$VELERO_PLUGIN_NAME'"' '"'$VELERO_VERSION'"' '"'$ZFS_OPERATOR_NAMESPACE'"'
 
 }
 
@@ -28,6 +28,7 @@ pipeline_id=$(echo $2)
 commit_id=$(echo $3)
 velero_plugin=$(echo $4)
 velero_version=$(echo $5)
+zfs_operator_namespace=$(echo $6)
 source ~/.profile
 gittoken=$(echo "$github_token")
 
@@ -126,6 +127,7 @@ sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: xfs-backup
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: xfs-bkp-diff-node/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: ACTION/{n;s/.*/            value: backup/g}' \
 -e '/name: VELERO_BACKUP_NAME/{n;s/.*/            value: xfs-diff-node-backup/g}' \
 -e "/name: VELERO_PLUGIN_NAME/{n;s/.*/            value: ${velero_plugin}/g}" \
@@ -315,7 +317,7 @@ fi
 }
 
 if [ "$1" == "run_job" ];then
-  app_deploy $2 $3 $4 $5 $6
+  app_deploy $2 $3 $4 $5 $6 $7
   app_loadgen
   xfs_backup_diff_node
   xfs_restore_diff_node
