@@ -125,6 +125,7 @@ sed -i -e 's/generateName: zfspv-velero-backup-restore-/generateName: zfs-incr-b
 -e '/name: APP_NAMESPACE/{n;s/.*/            value: zfs-incr-bkp/g}' \
 -e '/name: APP_LABEL/{n;s/.*/            value: app=percona/g}' \
 -e '/name: APP_PVC/{n;s/.*/            value: percona-pvc/g}' \
+-e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/.*/            value: ${zfs_operator_namespace}/}" \
 -e '/name: ACTION/{n;s/.*/            value: incremental_backup/g}' \
 -e '/name: VELERO_SCHEDULE_BACKUP_NAME/{n;s/.*/            value: zfs-incr-backup/g}' \
 -e "/name: VELERO_PLUGIN_NAME/{n;s/.*/            value: ${velero_plugin}/g}" \
