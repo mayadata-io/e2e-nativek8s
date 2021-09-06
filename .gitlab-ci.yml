@@ -114,6 +114,12 @@ stages:
     - chmod 755 ./pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs
     - ./pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs
 
+3F11-LVMPV-RAW-BLOCK-VOLUME:
+  extends: .func1_test_template
+  script:
+    - chmod 755 ./pipeline/stages/3-functional/3F11-raw-block-volume
+    - ./pipeline/stages/3-functional/3F11-raw-block-volume
+
 ##################################
 
 .chaos_template:
