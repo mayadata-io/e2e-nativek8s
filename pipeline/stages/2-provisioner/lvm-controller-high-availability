@@ -37,7 +37,7 @@ cd lvm-localpv/e2e-tests
 cp experiments/functional/lvm-controller-high-availability/run_e2e_test.yml lvm_ctrl_HA.yml
 
 # copy the content of provisioner run_e2e_test.yml into a temporary file to update the test specific parameters.
-sed -i -e "/name: OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" \
+sed -i -e "/name: OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${lvm_operator_ns}/g}" \
 
 cat lvm_ctrl_HA.yml
 
