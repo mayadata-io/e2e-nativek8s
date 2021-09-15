@@ -36,7 +36,7 @@ echo $test_name
 cd lvm-localpv/e2e-tests
 cp experiments/functional/lvmpv-raw-block-volume/run_e2e_test.yml run_raw_block_volume.yml
 
-sed -i -e "/name: lvm_OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${lvm_operator_ns}/g}" run_raw_block_volume.yml
+sed -i -e "/name: LVM_OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${lvm_operator_ns}/g}" run_raw_block_volume.yml
 
 cat run_raw_block_volume.yml
 
