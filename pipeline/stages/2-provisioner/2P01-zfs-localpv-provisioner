@@ -51,7 +51,7 @@ cd zfs-localpv/e2e-tests
 cp experiments/zfs-localpv-provisioner/run_e2e_test.yml zfs_pv_provisioner.yml
 
 # Modify test specific values in runner file using sed command
-sed -i -e "/name: ZFS_BRANCH/{n;s/value: 'master'/value: ${zfs_branch}/g}" \
+sed -i -e "/name: ZFS_BRANCH/{n;s/value: 'develop'/value: ${zfs_branch}/g}" \
 -e "/name: ZFS_DRIVER_IMAGE/{n;s/.*/            value: ${zfs_driver_image}/g}" \
 -e "/name: ZFS_OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${zfs_operator_namespace}/g}" \
 -e "/name: ZPOOL_CREATION/{n;s/.*/            value: '${zpool_creation}'/g}" \
