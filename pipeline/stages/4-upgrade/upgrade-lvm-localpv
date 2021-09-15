@@ -42,7 +42,7 @@ cp experiments/upgrade-lvm-localpv/run_e2e_test.yml upgrade.yml
 # Modify test specific values in runner file using sed command
 sed -i -e "/name: TO_VERSION_LVM_BRANCH/{n;s/.*/            value: ${to_version_lvm_branch}/g}" \
 -e "/name: TO_VERSION_LVM_DRIVER_IMAGE/{n;s/.*/            value: ${to_version_lvm_driver_image}/g}" \
--e "/name: LVM_OPERATOR_NAMESPACE/{n;s/.*/            value: ${lvm_operator_ns}/g}" upgrade.yml
+-e "/name: LVM_OPERATOR_NAMESPACE/{n;s/value: 'openebs'/value: ${lvm_operator_ns}/g}" upgrade.yml
 
 cat upgrade.yml
 
