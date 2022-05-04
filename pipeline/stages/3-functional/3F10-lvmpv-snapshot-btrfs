@@ -6,7 +6,7 @@ mkdir -p /root/.ssh
 touch /root/.ssh/id_rsa
 echo "$SSH_KEYS" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
-ssh -o StrictHostKeyChecking=no $lvm_user@$ip -p $port -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$LVM_OPERATOR_NAMESPACE'"'
+ssh -o StrictHostKeyChecking=no $lvm_user@$ip  -i /root/.ssh/id_rsa -o LogLevel=ERROR 'cd e2e-nativek8s && bash pipeline/stages/3-functional/3F10-lvmpv-snapshot-btrfs run_job '"'$CI_JOB_ID'"'' '"'$CI_PIPELINE_ID'"' '"'$CI_COMMIT_SHA'"' '"'$LVM_OPERATOR_NAMESPACE'"'
 
 }
 
