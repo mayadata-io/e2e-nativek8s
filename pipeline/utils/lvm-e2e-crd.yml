@@ -52,7 +52,7 @@ spec:
     # Each version can be enabled/disabled by Served flag.
     served: false
     # One and only one version must be marked as the storage version.
-    storage: true
+    storage: false
     # A schema is required
     schema:
       openAPIV3Schema:
