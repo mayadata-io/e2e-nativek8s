@@ -61,7 +61,7 @@ fi
 
 cat result-$job_name.yml
 
-kubectl apply -f result-$job_name.yml --validate=false
+kubectl apply -f result-$job_name.yml
 
 #if [[ "${time_phase}" == "end_time" ]];then
 #  rm result-$job_name.yml
