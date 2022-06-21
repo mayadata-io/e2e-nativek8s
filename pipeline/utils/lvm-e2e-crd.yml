@@ -50,7 +50,7 @@ spec:
   versions:
   - name: v1alpha1
     # Each version can be enabled/disabled by Served flag.
-    served: true
+    served: false
     # One and only one version must be marked as the storage version.
     storage: true
     # A schema is required
@@ -64,15 +64,36 @@ spec:
             type: string
   - name: v1
     served: true
-    storage: false
+    storage: true
     schema:
       openAPIV3Schema:
         type: object
         properties:
-          host:
-            type: string
-          port:
-            type: string
+          spec:
+            type: object
+            properties:
+              testResult:
+                type: string
+              testcaseId:
+                type: string
+              testStatus:
+                type: object
+                properties:
+                  phase: 
+                    type: string
+                  start_time:
+                    type: string
+                  end_time:
+                    type: string
+                  build_id:
+                    type: integer
+                  job_id:
+                    type: integer
+                  pipeline_id:
+                    type: integer
+                  event:
+                    type: object
+                    properties:
   # The conversion section is introduced in Kubernetes 1.13+ with a default value of
   # None conversion (strategy sub-field set to None).
   conversion:
