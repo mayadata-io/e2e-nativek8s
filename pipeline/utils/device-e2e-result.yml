@@ -1,5 +1,5 @@
 ---
-apiVersion: devicee2e.io/v1alpha1
+apiVersion: devicee2e.io/v1
 kind: devicee2eResult
 metadata:
   # name of the e2e testcase
