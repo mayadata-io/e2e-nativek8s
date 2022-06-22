@@ -1,5 +1,5 @@
 ---
-apiVersion: zfse2e.io/v1alpha1
+apiVersion: zfse2e.io/v1
 kind: zfse2eResult
 metadata:
   # name of the e2e testcase
