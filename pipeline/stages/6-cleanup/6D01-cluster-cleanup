@@ -8,8 +8,8 @@ chmod 600 /root/.ssh/id_rsa
 echo $CI_JOB_ID
 ###clone e2e-nativek8s-repo
 echo "cloning e2e-nativek8s repo*************"
-ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa 'git clone -b device-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
-ssh -o StrictHostKeyChecking=no $device_user@$device_ip -p $device_port -i /root/.ssh/id_rsa 'cd e2e-nativek8s && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
+ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $device_user@$device_ip -i /root/.ssh/id_rsa 'git clone -b device-localpv https://github.com/mayadata-io/e2e-nativek8s.git'
+ssh -o StrictHostKeyChecking=no $device_user@$device_ip -i /root/.ssh/id_rsa 'cd e2e-nativek8s && bash pipeline/stages/6-cleanup/6D01-cluster-cleanup run_job '"'$CI_JOB_ID'"''
 }
 
 cleanup_cluster() {
