@@ -86,7 +86,7 @@ spec:
                   end_time:
                     type: string
                   build_id:
-                    type: integer
+                    type: string
                   job_id:
                     type: integer
                   pipeline_id:
