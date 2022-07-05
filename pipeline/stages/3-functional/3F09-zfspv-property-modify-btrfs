@@ -46,7 +46,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_deploy_btrfs_property_modify.
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'btrfs-property-modify'/g}" \
 -e 's/generateName: percona-deploy-/generateName: percona-provision-btrfs-property-modify-/g' \
 -e "/name: STORAGE_CLASS/{n;s/value: 'zfspv-sc'/value: 'zfspv-sc-btrfs'/g}" \
--e 's/app: percona-deployment/app: percona-deployment-zfs-property-modify/g' percona_deploy_btrfs_property_modify.yml
+-e 's/app: percona-deployment/app: percona-deployment-btrfs-property-modify/g' percona_deploy_btrfs_property_modify.yml
 
 cat percona_deploy_btrfs_property_modify.yml
 

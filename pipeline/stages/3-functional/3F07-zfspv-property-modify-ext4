@@ -46,7 +46,7 @@ cp apps/percona/deployers/run_e2e_test.yml percona_deploy_ext4_property_modify.y
 sed -i -e "/name: APP_NAMESPACE/{n;s/value: 'percona'/value: 'ext4-property-modify'/g}" \
 -e 's/generateName: percona-deploy-/generateName: percona-provision-ext4-property-modify-/g' \
 -e "/name: STORAGE_CLASS/{n;s/value: 'zfspv-sc'/value: 'zfspv-sc-ext4'/g}" \
--e 's/app: percona-deployment/app: percona-deployment-zfs-property-modify/g' percona_deploy_ext4_property_modify.yml
+-e 's/app: percona-deployment/app: percona-deployment-ext4-property-modify/g' percona_deploy_ext4_property_modify.yml
 
 cat percona_deploy_ext4_property_modify.yml
 
