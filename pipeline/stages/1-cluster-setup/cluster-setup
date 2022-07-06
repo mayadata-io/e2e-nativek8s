@@ -29,7 +29,7 @@ echo "***Checking the Cluster's Health***"
 echo "***Checking for the number of nodes in ready state***"
 ready_nodes=$(ssh -o StrictHostKeyChecking=no $lvm_user@$ip -i /root/.ssh/id_rsa kubectl get nodes --no-headers | grep -v NotReady | wc -l)
 
-if [ "$ready_nodes" -eq 4 ]; then
+if [ "$ready_nodes" -eq $lvm_ready_nodes ]; then
 echo "Number of nodes in ready state is $ready_nodes"
 echo "***Cluster is in Healthy state***"
 
